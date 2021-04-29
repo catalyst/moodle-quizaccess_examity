@@ -1,8 +1,10 @@
 # examity #
 
-TODO Describe the plugin shortly here.
+Description : 
+Moodle / Examity integration 
+https://www.examity.com/
 
-TODO Provide more detailed description here.
+Providing an easy way to connect to Examity within course quiz
 
 ## Installing via uploaded ZIP file ##
 
