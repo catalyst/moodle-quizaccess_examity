@@ -25,4 +25,24 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'examity';
+$string['pluginname'] = 'Examity';
+$string['manage'] = 'Enable';
+$string['manage_help'] = 'If disabled you will need to configure Examity manually';
+$string['select_field'] = 'Require the use of examity';
+
+$string['client_id'] = "Client ID";
+$string['client_secret'] = "Client Secret";
+
+$string['consumer_id'] = "Consumer ID";
+$string['consumer_secret'] = "Consumer Secret";
+
+
+$string['client_id_help'] = "Enter your client ID";
+$string['consumer_id_help'] = "Enter your Consumer ID";
+
+$string['client_secret_help'] = "Enter your client secret";
+$string['consumer_secret_help'] = "Enter your consumer secret";
+
+
+
+

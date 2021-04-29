@@ -105,4 +105,3 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
 
 }
 
-

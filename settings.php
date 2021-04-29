@@ -26,8 +26,36 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
+
+    $settings = new admin_settingpage('quizaccess_examity', new lang_string('pluginname', 'quizaccess_examity'));
+
+    // $ADMIN->add('localplugins', new admin_category('local_examity_settings', new lang_string('pluginname', 'local_examity')));
+
+    // $settingspage = new admin_settingpage('managelocalexamity', new lang_string('manage', 'local_examity'));
+ 
     if ($ADMIN->fulltree) {
-        // TODO: Define the plugin settings page - {@link https://docs.moodle.org/dev/Admin_settings}.
+
+        $settings->add(new admin_setting_configcheckbox('quizaccess_examity/pluginname',
+        get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 1));
+
+        //  
+        $settings->add(new admin_setting_configtext('quizaccess_examity/client_id',
+        get_string('client_id', 'quizaccess_examity'),
+        get_string('client_id_help', 'quizaccess_examity'), '15', PARAM_INT, 30));
+
+        $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/client_secret',
+        get_string('client_secret', 'quizaccess_examity'),
+        get_string('client_secret_help', 'quizaccess_examity'), '15', PARAM_INT));
+
+
+        $settings->add(new admin_setting_configtext('quizaccess_examity/consumer_id',
+        get_string('consumer_id', 'quizaccess_examity'),
+        get_string('consumer_id_help', 'quizaccess_examity'), '15', PARAM_INT, 30));
+
+        $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/consumer_secret',
+        get_string('consumer_secret', 'quizaccess_examity'),
+        get_string('consumer_secret_help', 'quizaccess_examity'), '15', PARAM_INT));
     }
+
+    // $ADMIN->add('localplugins', $settings);
 }
