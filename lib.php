@@ -93,6 +93,7 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
 
     $errors = array();
 
+
     // Check the quiz and make sure the password is not empty
     foreach($files as $key => $value) {
 
@@ -102,6 +103,6 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
     }
 
     //TODO: throw validation message and return if no password has been set
-
+    // return $errors;
 }
 
