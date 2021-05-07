@@ -57,5 +57,4 @@ if ($hassiteconfig) {
         get_string('consumer_secret_help', 'quizaccess_examity'), '15', PARAM_INT));
     }
 
-    // $ADMIN->add('localplugins', $settings);
 }

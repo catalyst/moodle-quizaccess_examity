@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   plagiarism_turnitin
+ * @package   quizaccess_examity
  * @copyright 2012 iParadigms LLC
  */
 
