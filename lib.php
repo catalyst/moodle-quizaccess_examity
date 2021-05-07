@@ -92,17 +92,13 @@ function quizaccess_examity_coursemodule_edit_post_actions($data, $course) {
 function quizaccess_examity_coursemodule_validation($data, $files) {
 
     $errors = array();
-
-
     // Check the quiz and make sure the password is not empty
-    foreach($files as $key => $value) {
+    // foreach($files as $key => $value) {
 
-        if($key == 'quizpassword' && $value == ""){
-            $errors['password'] = 'no password';
-        }
-    }
-
-    //TODO: throw validation message and return if no password has been set
-    // return $errors;
+    //     if($key == 'quizpassword' && $value == ""){
+    //         $errors['password'] = 'Requires password to be set';
+    //         return $errors;
+    //     }
+    // }
 }
 
