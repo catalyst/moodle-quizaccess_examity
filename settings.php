@@ -39,12 +39,12 @@ if ($hassiteconfig) {
         get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 1));
 
         //  
-        $settings->add(new admin_setting_configtext('quizaccess_examity/client_id',
-        get_string('client_id', 'quizaccess_examity'),
-        get_string('client_id_help', 'quizaccess_examity'), '15', PARAM_INT, 30));
+        $settings->add(new admin_setting_configtext('quizaccess_examity/username',
+        get_string('examity_username', 'quizaccess_examity'),
+        get_string('client_id_help', 'quizaccess_examity'), '15', PARAM_EMAIL, 30));
 
         $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/client_secret',
-        get_string('client_secret', 'quizaccess_examity'),
+        get_string('examity_password', 'quizaccess_examity'),
         get_string('client_secret_help', 'quizaccess_examity'), '15', PARAM_INT));
 
 
