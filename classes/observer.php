@@ -1,5 +1,4 @@
 <?php
-namespace quizaccess_examity_observer;
 
 // This file is part of Moodle - http://moodle.org/
 //
@@ -40,8 +39,9 @@ class quizaccess_examity_observer {
      * @param \core\event\course_module_updated $event
      */
     public static function course_module_updated(\core\event\course_module_updated $event) {
-        global $CFG, $DB, $COURSE;
-        var_dump('course module update event is triggering?');die;
+        // global $CFG, $DB, $COURSE;
+        echo file_put_contents("/var/www/html/mod/quiz/accessrule/examity/classes/lidn.txt","course_module_updated");
+
     }
 
     /**
@@ -49,8 +49,21 @@ class quizaccess_examity_observer {
      * @param \core\event\course_module_deleted $event
      */
     public static function course_module_deleted(\core\event\course_module_deleted $event) {
-        global $CFG, $DB, $COURSE;
-        var_dump('course module delete event is triggering?');die;
+        // global $CFG, $DB, $COURSE;
+        echo file_put_contents("/var/www/html/mod/quiz/accessrule/examity/classes/lidn.txt","course_module_deleted");
 
+
+    }
+
+    public static function user_loggedin(\core\event\base $event)
+    {
+
+        // $event_data = $event->get_data();
+        // var_dump($event_data);
+        // die();
+
+        echo file_put_contents("/var/www/html/mod/quiz/accessrule/examity/classes/lidn.txt","user_loggedin");
+
+        
     }
 }

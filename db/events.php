@@ -29,5 +29,10 @@ $observers = array (
     array(
         'eventname' => '\core\event\course_module_deleted',
         'callback'  => 'quizaccess_examity_observer::course_module_deleted'
-    )
+    ),
+    array(
+        'eventname' => '\core\event\user_loggedin',
+        'callback' => 'quizaccess_examity_observer::user_loggedin',
+    ),
 );
+
