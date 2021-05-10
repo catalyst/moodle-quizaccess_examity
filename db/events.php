@@ -24,15 +24,21 @@ defined('MOODLE_INTERNAL') || die();
 $observers = array (
     array(
         'eventname' => '\core\event\course_module_updated',
-        'callback'  => 'quizaccess_examity_observer::course_module_updated'
+        'callback'  => 'quizaccess_examity_observer::update'
     ),
     array(
         'eventname' => '\core\event\course_module_deleted',
-        'callback'  => 'quizaccess_examity_observer::course_module_deleted'
+        'callback'  => 'quizaccess_examity_observer::update'
     ),
     array(
         'eventname' => '\core\event\user_loggedin',
-        'callback' => 'quizaccess_examity_observer::user_loggedin',
+        'callback' => 'quizaccess_examity_observer::update',
+    ),
+    array (
+        'eventname' => '\core\event\course_module_created',
+        'callback'  => 'quizaccess_examity_observer::update',
     ),
 );
+
+
 
