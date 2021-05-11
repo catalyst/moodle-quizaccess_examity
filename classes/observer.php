@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Auto-cohort local plugin for Moodle 3.5+
+ * Examity / Moodle integration 
  * @package    quizaccess_examity
  * @copyright  2019 Catalyst IT
  * @author     Ant
@@ -24,21 +24,201 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
+require(__DIR__.'/../../../config.php');
 
 /**
- * User profile event observer class.
+ * Examity event observer class.
  *
- * Delegates profile and cohort processing to lib/local_cohortauto_handler().
+ * Send API requests based on Moodle event
  *
  * @copyright  2019 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quizaccess_examity_observer {
 
-
     public static function update(\core\event\base $event) {
-        // This code works when put inside the corresponding 'store' function in blocks/recent_activity/classes/observer.php
-        echo file_put_contents("/var/www/html/mod/quiz/accessrule/examity/classes/lidn.txt",$event->get_data());
+        global $DB;
+        $url = null;
+        $postdata  = [];
 
+        // Get API creds from DB
+        $username = $DB->get_record('mdl_config_plugins', ['name' => 'username']);
+        $password = $DB->get_record('mdl_config_plugins', ['name' => 'client_secret']);
+
+        $validation_data = [
+            'client_id' : 0,
+            'username'  : $username,
+            'password'  : $password;
+        ];
+
+        var_dump($username);die;
+
+        // $postdata['course_id'] = $event->courseid;
+        // $postdata['cmid']      = $event->objectid;
+        // $postdata['userid']    = $event->userid;
+
+        // Authenticate with Examity 
+        $url = 'https://bridge.examity.com/auth';
+        $event = 'auth';
+        $this->postAPI($url, $event, $validation_data)
+
+        // Once Authenticated fun the event action
+        switch ($event->eventname) {
+            case '\core\event\course_module_created':
+                    $url = 'https://bridge.examity.com/courses';
+                    $event = $event->eventname;
+                    var_dump($this->postAPI($url, $event, $postdata));die;;
+                break;
+            case '\core\event\course_module_updated':
+                    $postdata['course_id'] = $event->courseid;
+                    $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
+                    var_dump($this->postAPI($url, $event, $postdata));die;
+                break;
+            case '\core\event\course_module_deleted':
+                    $postdata['course_id'] = $event->courseid;
+                    $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
+                    var_dump($this->postAPI($url, $event, $postdata));die;
+                break;
+            default:
+                return;
+        }
     }
+
+    public static function postAPI($url, $event, $postdata=null, $headers=null, $fullresponse=false, $timeout=300, $connecttimeout=20, $skipcertverify=false) {
+
+        global $CFG;
+        $options = array();
+    
+        // Only http and https links supported.
+        if (!preg_match('|^https?://|i', $url)) {
+            if ($fullresponse) {
+                $response = new stdClass();
+                $response->status        = 0;
+                $response->headers       = array();
+                $response->response_code = 'Invalid protocol specified in url';
+                $response->results       = '';
+                $response->error         = 'Invalid protocol specified in url';
+                return $response;
+            } else {
+                return false;
+            }
+        }
+    
+        $headers2 = array();
+        if (is_array($headers)) {
+            foreach ($headers as $key => $value) {
+                if (is_numeric($key)) {
+                    $headers2[] = $value;
+                } else {
+                    $headers2[] = "$key: $value";
+                }
+            }
+        }
+    
+        if ($skipcertverify) {
+            $options['CURLOPT_SSL_VERIFYPEER'] = false;
+        } else {
+            $options['CURLOPT_SSL_VERIFYPEER'] = true;
+        }
+    
+        $options['CURLOPT_CONNECTTIMEOUT'] = $connecttimeout;
+    
+        $options['CURLOPT_FOLLOWLOCATION'] = 1;
+        $options['CURLOPT_MAXREDIRS'] = 5;
+    
+        // Format post data
+        if (is_array($postdata)) {
+            $postdata = format_postdata_for_curlcall($postdata);
+        } else if (empty($postdata)) {
+            $postdata = null;
+        }
+    
+        $curl = new curl();
+        $curl->setHeader($headers2);
+    
+        $options['CURLOPT_RETURNTRANSFER'] = true;
+        $options['CURLOPT_NOBODY'] = false;
+        $options['CURLOPT_TIMEOUT'] = $timeout;
+
+        switch ($event) {
+            case '\core\event\course_module_created':
+                    $content = $curl->post($url, $postdata, $options);
+                break;
+            case '\core\event\course_module_updated':
+                    $content = $curl->put($url, $postdata, $options);
+                break;
+            case '\core\event\course_module_deleted':
+                    $content = $curl->delete($url, $postdata, $options);
+                break;
+            case 'auth':
+                    $content = $curl->post($url, $postdata, $options);
+                break;
+            default:
+                return;
+        }
+    
+        $info       = $curl->get_info();
+        $error_no   = $curl->get_errno();
+        $rawheaders = $curl->get_raw_response();
+    
+        if ($error_no) {
+            $error = $content;
+            if (!$fullresponse) {
+                debugging("cURL request for \"$url\" failed with: $error ($error_no)", DEBUG_ALL);
+                return false;
+            }
+    
+            $response = new stdClass();
+            if ($error_no == 28) {
+                $response->status    = '-100'; // Mimic snoopy.
+            } else {
+                $response->status    = '0';
+            }
+            $response->headers       = array();
+            $response->response_code = $error;
+            $response->results       = false;
+            $response->error         = $error;
+            return $response;
+        }
+    
+        if (empty($info['http_code'])) {
+            // For security reasons we support only true http connections
+            $response = new stdClass();
+            $response->status        = '0';
+            $response->headers       = array();
+            $response->response_code = 'Unknown cURL error';
+            $response->results       = false; // do NOT change this, we really want to ignore the result!
+            $response->error         = 'Unknown cURL error';
+    
+        } else {
+            $response = new stdClass();
+            $response->status        = (string)$info['http_code'];
+            $response->headers       = $rawheaders;
+            $response->results       = $content;
+            $response->error         = '';
+    
+            // Encase there's multiple headers on redirect, find the status of the last one.
+            $firstline = true;
+            foreach ($rawheaders as $line) {
+                if ($firstline) {
+                    $response->response_code = $line;
+                    $firstline = false;
+                }
+                if (trim($line, "\r\n") === '') {
+                    $firstline = true;
+                }
+            }
+        }
+    
+        if ($fullresponse) {
+            return $response;
+        }
+    
+        if ($info['http_code'] != 200) {
+            debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
+            return false;
+        }
+        return $response->results;
+    }
+    
 }
