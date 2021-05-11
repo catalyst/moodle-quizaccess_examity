@@ -55,8 +55,7 @@ class quizaccess_examity_observer {
 
         // Authenticate with Examity 
         $url = 'https://bridge.examity.com/auth';
-        $event = 'auth';
-        var_dump(self::postAPI($url, $event, $validation_data));die;
+        // var_dump(self::postAPI($url, 'auth', $validation_data));die;
 
         // Once Authenticated fun the event action
         switch ($event->eventname) {
@@ -121,14 +120,14 @@ class quizaccess_examity_observer {
     
         $options['CURLOPT_FOLLOWLOCATION'] = 1;
         $options['CURLOPT_MAXREDIRS'] = 5;
-    
+  
         // Format post data
         if (is_array($postdata)) {
             $postdata = format_postdata_for_curlcall($postdata);
         } else if (empty($postdata)) {
             $postdata = null;
         }
-    
+
         $curl = new curl();
         $curl->setHeader($headers2);
     
@@ -209,7 +208,7 @@ class quizaccess_examity_observer {
         if ($fullresponse) {
             return $response;
         }
-    
+
         // if ($info['http_code'] != 200) {
         //     debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
         //     return false;
