@@ -24,7 +24,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-require(__DIR__.'/../../../config.php');
 
 /**
  * Examity event observer class.
@@ -41,17 +40,14 @@ class quizaccess_examity_observer {
         $url = null;
         $postdata  = [];
 
-        // Get API creds from DB
-        $username = $DB->get_record('mdl_config_plugins', ['name' => 'username']);
-        $password = $DB->get_record('mdl_config_plugins', ['name' => 'client_secret']);
+        $username = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
+        $password = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
 
         $validation_data = [
-            'client_id' : 0,
-            'username'  : $username,
-            'password'  : $password;
+            'client_id' => 0,
+            'username'  => $username->value,
+            'password'  => $password->value
         ];
-
-        var_dump($username);die;
 
         // $postdata['course_id'] = $event->courseid;
         // $postdata['cmid']      = $event->objectid;
@@ -60,24 +56,24 @@ class quizaccess_examity_observer {
         // Authenticate with Examity 
         $url = 'https://bridge.examity.com/auth';
         $event = 'auth';
-        $this->postAPI($url, $event, $validation_data)
+        var_dump(self::postAPI($url, $event, $validation_data));die;
 
         // Once Authenticated fun the event action
         switch ($event->eventname) {
             case '\core\event\course_module_created':
                     $url = 'https://bridge.examity.com/courses';
                     $event = $event->eventname;
-                    var_dump($this->postAPI($url, $event, $postdata));die;;
+                    var_dump(self::postAPI($url, $event, $postdata));die;;
                 break;
             case '\core\event\course_module_updated':
                     $postdata['course_id'] = $event->courseid;
                     $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
-                    var_dump($this->postAPI($url, $event, $postdata));die;
+                    var_dump(self::postAPI($url, $event, $postdata));die;
                 break;
             case '\core\event\course_module_deleted':
                     $postdata['course_id'] = $event->courseid;
                     $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
-                    var_dump($this->postAPI($url, $event, $postdata));die;
+                    var_dump(self::postAPI($url, $event, $postdata));die;
                 break;
             default:
                 return;
@@ -214,10 +210,10 @@ class quizaccess_examity_observer {
             return $response;
         }
     
-        if ($info['http_code'] != 200) {
-            debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
-            return false;
-        }
+        // if ($info['http_code'] != 200) {
+        //     debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
+        //     return false;
+        // }
         return $response->results;
     }
     

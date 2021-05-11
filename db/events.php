@@ -32,7 +32,7 @@ $observers = array (
     ),
     array (
         'eventname' => '\core\event\course_module_created',
-        'callback'  => 'quizaccess_examity_observer::update',
+        'callback'  => 'quizaccess_examity_observer::update'
     ),
 );
 
