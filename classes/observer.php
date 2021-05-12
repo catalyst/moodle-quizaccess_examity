@@ -18,7 +18,7 @@
 /**
  * Examity / Moodle integration 
  * @package    quizaccess_examity
- * @copyright  2019 Catalyst IT
+ * @copyright  2021 Catalyst IT
  * @author     Ant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die;
  *
  * Send API requests based on Moodle event
  *
- * @copyright  2019 Catalyst IT
+ * @copyright  2021 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quizaccess_examity_observer {
@@ -175,6 +175,7 @@ class quizaccess_examity_observer {
                 return;
         }
     
+        // get error messages if any
         $info       = $curl->get_info();
         $error_no   = $curl->get_errno();
         $rawheaders = $curl->get_raw_response();
