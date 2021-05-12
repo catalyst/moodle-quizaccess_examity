@@ -29,19 +29,20 @@ $string['pluginname'] = 'Examity';
 $string['manage'] = 'Enable';
 $string['manage_help'] = 'If disabled you will need to configure Examity manually';
 $string['select_field'] = 'Require the use of examity';
-
 $string['examity_username'] = "Examity email";
 $string['examity_password'] = "Examity password";
-
 $string['consumer_id'] = "Consumer ID";
 $string['consumer_secret'] = "Consumer Secret";
-
-
 $string['client_id_help'] = "Enter your client ID";
 $string['consumer_id_help'] = "Enter your Consumer ID";
-
 $string['client_secret_help'] = "Enter your client secret";
 $string['consumer_secret_help'] = "Enter your consumer secret";
+$string['examity_url'] = "Examity API";
+$string['examity_url_help'] = "Please enter the Examity API url";
+
+
+
+
 
 
 

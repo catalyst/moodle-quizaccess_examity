@@ -44,6 +44,8 @@ class quizaccess_examity_observer {
         // Authenticate with Examity 
         $username = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
         $password = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
+        $url      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
+
 
         $validation_data = "{
                                 \"client_id\":171,
@@ -55,50 +57,64 @@ class quizaccess_examity_observer {
         $postdata['cmid']      = $event->objectid;
         $postdata['userid']    = $event->userid;
 
-        $url = 'https://bridge.examity.com/auth';
-        var_dump(self::postAPI($url, 'auth', $validation_data));die;
+
+        // Connect to examity auth
+        self::postAPI($url->value, 'auth', $validation_data);
 
         // create, update, delete course 
         switch ($event->eventname) {
             case '\core\event\course_module_created':
-                    $url = 'https://bridge.examity.com/courses';
-                    $event = $event->eventname;
+
+                    $url = $url->value;
+                    $course_code = $event->courseid;
+                    $course_name = $event->courseid;
+                    $primary_instructor_id = $event->courseid;
+                    $instructor_ids = $event->courseid; 
+                    $status_id = $event->courseid;  
+                    $metadata = $event->courseid;  
+
                     $postdata = 
                     "{
-                        \"course_code\":\"$postdata['course_id']\",
-                        \"course_name\":\"$event->courseid\",
-                        \"primary_instructor_id\":\"$postdata['userid']\",
+                        \"course_code\":\"$course_code\",
+                        \"course_name\":\"$course_name\",
+                        \"primary_instructor_id\":\"$instructor_ids\",
                         \"instructor_ids\":[
-                            \"$postdata['userid']\",
+                            \"$instructor_ids\",
                         ],
-                        \"status_id\": \"$postdata['cmid']\",
+                        \"status_id\": \"$status_id\",
                         \"metadata\": {}
                     }";
-
-                    var_dump(self::postAPI($url, $event, $postdata));die;
+                    self::postAPI($url, $event, $postdata);
 
                 break;
             case '\core\event\course_module_updated':
-                    $postdata['course_id'] = $event->courseid;
-                    $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
+
+                    $url = $url->value;
+                    $course_code = $event->courseid;
+                    $course_name = $event->courseid;
+                    $primary_instructor_id = $event->courseid;
+                    $instructor_ids = $event->courseid; 
+                    $status_id = $event->courseid;  
+                    $metadata = $event->courseid;  
+
                     $postdata = 
                     "{
-                        \"course_code\":\"$postdata['course_id']\",
-                        \"course_name\":\"$event->courseid\",
-                        \"primary_instructor_id\":\"$postdata['userid']\",
+                        \"course_code\":\"$course_code\",
+                        \"course_name\":\"$course_name\",
+                        \"primary_instructor_id\":\"$instructor_ids\",
                         \"instructor_ids\":[
-                            \"$postdata['userid']\",
+                            \"$instructor_ids\",
                         ],
-                        \"status_id\": \"$postdata['cmid']\",
+                        \"status_id\": \"$status_id\",
                         \"metadata\": {}
-                      }";
+                    }";
 
-                    var_dump(self::postAPI($url, $event, $postdata));die;
+                    self::postAPI($url, $event, $postdata);
 
                 break;
             case '\core\event\course_module_deleted':
-                    $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
-                    var_dump(self::postAPI($url, $event, $postdata));die;
+                $url = $url->value . $postdata->courseid;
+                self::postAPI($url, $event, $postdata);
                 break;
             default:
                 return;
@@ -237,6 +253,7 @@ class quizaccess_examity_observer {
         //     debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
         //     return false;
         // }
+
         return $response->results;
     }
     

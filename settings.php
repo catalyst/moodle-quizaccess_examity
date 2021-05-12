@@ -38,7 +38,10 @@ if ($hassiteconfig) {
         $settings->add(new admin_setting_configcheckbox('quizaccess_examity/pluginname',
         get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 1));
 
-        //  
+        $settings->add(new admin_setting_configtext('quizaccess_examity/url',
+        get_string('examity_url', 'quizaccess_examity'),
+        get_string('examity_url_help', 'quizaccess_examity'), '15', PARAM_TEXT, 30));
+
         $settings->add(new admin_setting_configtext('quizaccess_examity/username',
         get_string('examity_username', 'quizaccess_examity'),
         get_string('client_id_help', 'quizaccess_examity'), '15', PARAM_EMAIL, 30));
