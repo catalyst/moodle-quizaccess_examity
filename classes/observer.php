@@ -36,10 +36,12 @@ defined('MOODLE_INTERNAL') || die;
 class quizaccess_examity_observer {
 
     public static function update(\core\event\base $event) {
+        
         global $DB;
         $url = null;
         $postdata  = [];
 
+        // Authenticate with Examity 
         $username = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
         $password = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
 
@@ -49,29 +51,52 @@ class quizaccess_examity_observer {
                                 \"password\":\"$password->value\"
                             }";
 
-        // $postdata['course_id'] = $event->courseid;
-        // $postdata['cmid']      = $event->objectid;
-        // $postdata['userid']    = $event->userid;
+        $postdata['course_id'] = $event->courseid;
+        $postdata['cmid']      = $event->objectid;
+        $postdata['userid']    = $event->userid;
 
-        // Authenticate with Examity 
         $url = 'https://bridge.examity.com/auth';
         var_dump(self::postAPI($url, 'auth', $validation_data));die;
 
-    
-        // Once Authenticated fun the event action
+        // create, update, delete course 
         switch ($event->eventname) {
             case '\core\event\course_module_created':
                     $url = 'https://bridge.examity.com/courses';
                     $event = $event->eventname;
-                    var_dump(self::postAPI($url, $event, $postdata));die;;
+                    $postdata = 
+                    "{
+                        \"course_code\":\"$postdata['course_id']\",
+                        \"course_name\":\"$event->courseid\",
+                        \"primary_instructor_id\":\"$postdata['userid']\",
+                        \"instructor_ids\":[
+                            \"$postdata['userid']\",
+                        ],
+                        \"status_id\": \"$postdata['cmid']\",
+                        \"metadata\": {}
+                    }";
+
+                    var_dump(self::postAPI($url, $event, $postdata));die;
+
                 break;
             case '\core\event\course_module_updated':
                     $postdata['course_id'] = $event->courseid;
                     $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
+                    $postdata = 
+                    "{
+                        \"course_code\":\"$postdata['course_id']\",
+                        \"course_name\":\"$event->courseid\",
+                        \"primary_instructor_id\":\"$postdata['userid']\",
+                        \"instructor_ids\":[
+                            \"$postdata['userid']\",
+                        ],
+                        \"status_id\": \"$postdata['cmid']\",
+                        \"metadata\": {}
+                      }";
+
                     var_dump(self::postAPI($url, $event, $postdata));die;
+
                 break;
             case '\core\event\course_module_deleted':
-                    $postdata['course_id'] = $event->courseid;
                     $url = 'https://bridge.examity.com/courses/' . $postdata->courseid;
                     var_dump(self::postAPI($url, $event, $postdata));die;
                 break;
@@ -80,6 +105,9 @@ class quizaccess_examity_observer {
         }
     }
 
+    //
+    // Run curl on examity's bridge api 
+    //
     public static function postAPI($url, $event, $postdata=null, $headers=null, $fullresponse=false, $timeout=300, $connecttimeout=20, $skipcertverify=false) {
 
         global $CFG;
@@ -121,14 +149,8 @@ class quizaccess_examity_observer {
     
         $options['CURLOPT_FOLLOWLOCATION'] = 1;
         $options['CURLOPT_MAXREDIRS'] = 5;
-  
-        // Format post data
-        // if (is_array($postdata)) {
-        //     $postdata = format_postdata_for_curlcall($postdata);
-        // } else if (empty($postdata)) {
-        //     $postdata = null;
-        // }
-
+        
+        // Start a curl request 
         $curl = new curl();
         $curl->setHeader($headers2);
     
@@ -210,10 +232,10 @@ class quizaccess_examity_observer {
             return $response;
         }
 
-        if ($info['http_code'] != 200) {
-            debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
-            return false;
-        }
+        // if ($info['http_code'] != 200) {
+        //     debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
+        //     return false;
+        // }
         return $response->results;
     }
     
