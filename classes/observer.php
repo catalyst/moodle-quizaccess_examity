@@ -109,7 +109,6 @@ class quizaccess_examity_observer {
         switch ($event->eventname) {
             case '\core\event\course_module_created':
 
-                    var_dump($COURSE);die;
 
                     $url = $url->value . '/courses';
                     $course_code = $COURSE->id;
@@ -151,9 +150,7 @@ class quizaccess_examity_observer {
                         \"metadata\":{}
                     }";
 
-                    // $postdata = "{\"course_code\":\"$course_code\",\"course_name\":\"$course_name\",\"primary_instructor_id\":$instructor_ids,\"instructor_ids\":[$instructor_ids],\"status_id\":$instructor_ids,\"metadata\":{}}";
-
-                    self::postAPI($url, $event->eventname, $postdata, $headers);
+                    var_dump(self::postAPI($url, $event->eventname, $postdata, $headers));die;
 
                 break;
             case '\core\event\course_module_deleted':
