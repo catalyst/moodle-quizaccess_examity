@@ -46,4 +46,3 @@ $string['examity_url_help'] = "Please enter the Examity API url";
 
 
 
-

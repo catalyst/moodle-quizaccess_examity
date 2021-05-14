@@ -38,6 +38,9 @@ class quizaccess_examity_observer {
     public static function update(\core\event\base $event) {
         
         global $DB;
+        global $COURSE;
+        global $USER;
+
         $url = null;
         $postdata  = [];
 
@@ -45,6 +48,8 @@ class quizaccess_examity_observer {
         $username = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
         $password = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
         $url      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
+        $userid = $event->userid;
+
 
 
         $validation_data = "{
@@ -53,67 +58,104 @@ class quizaccess_examity_observer {
                                 \"password\":\"$password->value\"
                             }";
 
-        $postdata['course_id'] = $event->courseid;
-        $postdata['cmid']      = $event->objectid;
-        $postdata['userid']    = $event->userid;
-
-
         // Connect to examity auth
-        self::postAPI($url->value, 'auth', $validation_data);
+        $token = self::postAPI($url->value .'/auth', 'auth', $validation_data);
+        $token_arr = json_decode($token, true);
+        $headers['Authorization'] = ' Bearer '. $token_arr["access_token"];
+
+
+        // Get instructor from Examity eg. 107151
+        $primary_instructor_id = self::postAPI($url->value .'/users' . '/' . $userid, 'get_user', null, $headers);
+        $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
+
+        // User exists in examity already
+        if(isset($primary_instructor_id_arr['user_id'])){
+            $primary_instructor_id = $primary_instructor_id_arr['user_id'];
+        } else {
+
+            $first_name = $USER->firstname;
+            $last_name = $USER->lastname;
+            $email = $USER->email;
+            $role_id = 3;
+            $id_photo = ''; 
+            $phone = $USER->phone1;  
+            $country_code = $USER->country;  
+            $timezone_id = $USER->timezone;  
+            $metadata = '';  
+            $username =  $USER->username;  
+            $send_password_reset_email = true;  
+
+            $postdata = "{
+                            \"first_name\":\"$first_name\",
+                            \"last_name\":\"$last_name\",
+                            \"email\":\"$email\",
+                            \"role_id\":$role_id,
+                            \"id_photo\":\"$id_photo\",
+                            \"phone\":\"$phone\",
+                            \"country_code\":$country_code,
+                            \"timezone_id\":$timezone_id,
+                            \"metadata\":{$metadata},
+                            \"username\":$username,
+                            \"send_password_reset_email\":$send_password_reset_email
+                        }";
+
+            var_dump(self::postAPI($url->value . '/users', 'create_user', $postdata, $headers));die;
+
+        }
+
+
 
         // create, update, delete course 
         switch ($event->eventname) {
             case '\core\event\course_module_created':
 
-                    $url = $url->value;
-                    $course_code = $event->courseid;
-                    $course_name = $event->courseid;
-                    $primary_instructor_id = $event->courseid;
-                    $instructor_ids = $event->courseid; 
-                    $status_id = $event->courseid;  
-                    $metadata = $event->courseid;  
+                    $url = $url->value . '/courses';
+                    $course_code = '171';
+                    $course_name = 'test course name';
+                    $primary_instructor_id = 107448;
+                    $instructor_ids = '107448'; 
+                    $status_id = 1;  
+                    $metadata = '';  
 
-                    $postdata = 
-                    "{
-                        \"course_code\":\"$course_code\",
-                        \"course_name\":\"$course_name\",
-                        \"primary_instructor_id\":\"$instructor_ids\",
-                        \"instructor_ids\":[
-                            \"$instructor_ids\",
-                        ],
-                        \"status_id\": \"$status_id\",
-                        \"metadata\": {}
-                    }";
-                    self::postAPI($url, $event, $postdata);
+                    $postdata = "{
+                                    \"course_code\":\"$course_code\",
+                                    \"course_name\":\"$course_name\",
+                                    \"primary_instructor_id\":$primary_instructor_id,
+                                    \"instructor_ids\":[$instructor_ids],
+                                    \"status_id\":$status_id,
+                                    \"metadata\":{}
+                                }";
+
+                    var_dump(self::postAPI($url, $event->eventname, $postdata, $headers));die;
+
 
                 break;
             case '\core\event\course_module_updated':
 
-                    $url = $url->value;
-                    $course_code = $event->courseid;
-                    $course_name = $event->courseid;
-                    $primary_instructor_id = $event->courseid;
-                    $instructor_ids = $event->courseid; 
-                    $status_id = $event->courseid;  
-                    $metadata = $event->courseid;  
+                    $url = $url->value . '/courses';
+                    $course_code = '171';
+                    $course_name = 'test course name';
+                    $primary_instructor_id = 0;
+                    $instructor_ids = '0,1'; 
+                    $status_id = 1;  
+                    $metadata = '';  
 
-                    $postdata = 
-                    "{
+                    $postdata = "{
                         \"course_code\":\"$course_code\",
                         \"course_name\":\"$course_name\",
-                        \"primary_instructor_id\":\"$instructor_ids\",
-                        \"instructor_ids\":[
-                            \"$instructor_ids\",
-                        ],
-                        \"status_id\": \"$status_id\",
-                        \"metadata\": {}
+                        \"primary_instructor_id\":$primary_instructor_id,
+                        \"instructor_ids\":[$instructor_ids],
+                        \"status_id\":$status_id,
+                        \"metadata\":{}
                     }";
 
-                    self::postAPI($url, $event, $postdata);
+                    // $postdata = "{\"course_code\":\"$course_code\",\"course_name\":\"$course_name\",\"primary_instructor_id\":$instructor_ids,\"instructor_ids\":[$instructor_ids],\"status_id\":$instructor_ids,\"metadata\":{}}";
+
+                    self::postAPI($url, $event->eventname, $postdata, $headers);
 
                 break;
             case '\core\event\course_module_deleted':
-                $url = $url->value . $postdata->courseid;
+                $url = $url->value . '/courses' . '/' . $event->courseid;
                 self::postAPI($url, $event, $postdata);
                 break;
             default:
@@ -124,11 +166,11 @@ class quizaccess_examity_observer {
     //
     // Run curl on examity's bridge api 
     //
-    public static function postAPI($url, $event, $postdata=null, $headers=null, $fullresponse=false, $timeout=300, $connecttimeout=20, $skipcertverify=false) {
+    public static function postAPI($url, $event=null, $postdata=null, $headers=null, $fullresponse=false, $timeout=300, $connecttimeout=20, $skipcertverify=false) {
 
         global $CFG;
         $options = array();
-    
+
         // Only http and https links supported.
         if (!preg_match('|^https?://|i', $url)) {
             if ($fullresponse) {
@@ -143,7 +185,7 @@ class quizaccess_examity_observer {
                 return false;
             }
         }
-    
+
         $headers2 = array();
         if (is_array($headers)) {
             foreach ($headers as $key => $value) {
@@ -165,7 +207,7 @@ class quizaccess_examity_observer {
     
         $options['CURLOPT_FOLLOWLOCATION'] = 1;
         $options['CURLOPT_MAXREDIRS'] = 5;
-        
+
         // Start a curl request 
         $curl = new curl();
         $curl->setHeader($headers2);
@@ -187,6 +229,11 @@ class quizaccess_examity_observer {
             case 'auth':
                     $content = $curl->post($url, $postdata, $options);
                 break;
+            case 'get_user':
+                    $content = $curl->get($url, $postdata, $options);
+            case 'create_user':
+                    $content = $curl->post($url, $postdata, $options);
+            break;
             default:
                 return;
         }
