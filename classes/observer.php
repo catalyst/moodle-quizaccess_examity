@@ -50,7 +50,7 @@ class quizaccess_examity_observer {
         $url      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
         $userid = $event->userid;
 
-
+        
 
         $validation_data = "{
                                 \"client_id\":171,
@@ -68,7 +68,7 @@ class quizaccess_examity_observer {
         $primary_instructor_id = self::postAPI($url->value .'/users' . '/' . $userid, 'get_user', null, $headers);
         $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
 
-        // User exists in examity already
+        // Instructor exists in examity already or create instructor
         if(isset($primary_instructor_id_arr['user_id'])){
             $primary_instructor_id = $primary_instructor_id_arr['user_id'];
         } else {
@@ -79,8 +79,8 @@ class quizaccess_examity_observer {
             $role_id = 3;
             $id_photo = ''; 
             $phone = $USER->phone1;  
-            $country_code = $USER->country;  
-            $timezone_id = $USER->timezone;  
+            $country_code = (int)$USER->country;  
+            $timezone_id = (int)$USER->timezone;  
             $metadata = '';  
             $username =  $USER->username;  
             $send_password_reset_email = true;  
@@ -89,18 +89,18 @@ class quizaccess_examity_observer {
                             \"first_name\":\"$first_name\",
                             \"last_name\":\"$last_name\",
                             \"email\":\"$email\",
-                            \"role_id\":$role_id,
+                            \"role_id\":3,
                             \"id_photo\":\"$id_photo\",
                             \"phone\":\"$phone\",
                             \"country_code\":$country_code,
                             \"timezone_id\":$timezone_id,
-                            \"metadata\":{$metadata},
-                            \"username\":$username,
+                            \"metadata\":{},
+                            \"username\":\"$username\",
                             \"send_password_reset_email\":$send_password_reset_email
                         }";
 
-            var_dump(self::postAPI($url->value . '/users', 'create_user', $postdata, $headers));die;
-
+            $user = self::postAPI($url->value . '/users', 'create_user', $postdata, $headers);
+            $primary_instructor_id = isset($user['user_id']);
         }
 
 
@@ -109,8 +109,10 @@ class quizaccess_examity_observer {
         switch ($event->eventname) {
             case '\core\event\course_module_created':
 
+                    var_dump($COURSE);die;
+
                     $url = $url->value . '/courses';
-                    $course_code = '171';
+                    $course_code = $COURSE->id;
                     $course_name = 'test course name';
                     $primary_instructor_id = 107448;
                     $instructor_ids = '107448'; 
