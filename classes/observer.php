@@ -43,36 +43,45 @@ class quizaccess_examity_observer {
 
         $url = null;
         $postdata  = [];
+        $moodle_course_id = (int)$COURSE->id;
+        $moodle_user_id   = (int)$event->userid.'11';
 
-        // Authenticate with Examity 
+        //
+        // Grab essential DB details 
+        // 
         $username = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
         $password = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
         $url      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
-        $userid = $event->userid;
+        $course   = $DB->get_record('examity_courses', ['moodle_course_id' => $moodle_course_id]);
+        $user     = $DB->get_record('examity_users', ['moodle_user_id' => $moodle_user_id]);
+        // $exam_id      = $DB->get_record('examity_exams', ['moodle_exam_id' => $event]);
 
-        
-
-        $validation_data = "{
-                                \"client_id\":171,
-                                \"username\":\"$username->value\",
-                                \"password\":\"$password->value\"
-                            }";
-
+        //
         // Connect to examity auth
-        $token = self::postAPI($url->value .'/auth', 'auth', $validation_data);
+        //
+        $validation_data = "{
+            \"client_id\":171,
+            \"username\":\"$username->value\",
+            \"password\":\"$password->value\"
+        }";
+        $token = self::postAPI($url->value .'/auth', 'create', $validation_data);
         $token_arr = json_decode($token, true);
         $headers['Authorization'] = ' Bearer '. $token_arr["access_token"];
 
+        //
+        // Get or create a course creator to use to create a course in examity
+        //
+        if($user) {
 
-        // Get instructor from Examity eg. 107151
-        $primary_instructor_id = self::postAPI($url->value .'/users' . '/' . $userid, 'get_user', null, $headers);
-        $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
-
-        // Instructor exists in examity already or create instructor
-        if(isset($primary_instructor_id_arr['user_id'])){
+            // Check for existing instructor from Examity based on course creator ID eg. 107151
+            $examity_user_id = (int)$user->examity_user_id ?? null;
+            $primary_instructor_id = self::postAPI($url->value .'/users' . '/' . $examity_user_id, 'read', null, $headers);
+            $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
             $primary_instructor_id = $primary_instructor_id_arr['user_id'];
+
         } else {
 
+            // No user in DB, indicating no user in examity, so create one 
             $first_name = $USER->firstname;
             $last_name = $USER->lastname;
             $email = $USER->email;
@@ -89,7 +98,7 @@ class quizaccess_examity_observer {
                             \"first_name\":\"$first_name\",
                             \"last_name\":\"$last_name\",
                             \"email\":\"$email\",
-                            \"role_id\":3,
+                            \"role_id\":$role_id,
                             \"id_photo\":\"$id_photo\",
                             \"phone\":\"$phone\",
                             \"country_code\":$country_code,
@@ -99,22 +108,24 @@ class quizaccess_examity_observer {
                             \"send_password_reset_email\":$send_password_reset_email
                         }";
 
-            $user = self::postAPI($url->value . '/users', 'create_user', $postdata, $headers);
-            $primary_instructor_id = isset($user['user_id']);
+            $user = self::postAPI($url->value . '/users', 'create', $postdata, $headers);
+
+            // Create a record of the user and the examity user in the DB
+            var_dump($user);die;
+            $primary_instructor_id = (int)$user['user_id'] ?? null;
         }
 
-
-
-        // create, update, delete course 
+        //
+        // Run curl requests based on moodle event, ie create course, update, delete etc
+        //
         switch ($event->eventname) {
-            case '\core\event\course_module_created':
-
+            case '\core\event\course_module_created': // Triggers when quiz is selected as a course activity
 
                     $url = $url->value . '/courses';
-                    $course_code = $COURSE->id;
+                    $course_code = $examity_course_id;
                     $course_name = 'test course name';
-                    $primary_instructor_id = 107448;
-                    $instructor_ids = '107448'; 
+                    $primary_instructor_id = $primary_instructor_id;
+                    $instructor_ids = $primary_instructor_id; 
                     $status_id = 1;  
                     $metadata = '';  
 
@@ -127,17 +138,16 @@ class quizaccess_examity_observer {
                                     \"metadata\":{}
                                 }";
 
-                    var_dump(self::postAPI($url, $event->eventname, $postdata, $headers));die;
-
+                    var_dump(self::postAPI($url, 'create', $postdata, $headers));die;
 
                 break;
             case '\core\event\course_module_updated':
 
                     $url = $url->value . '/courses';
                     $course_code = '171';
-                    $course_name = 'test course name';
-                    $primary_instructor_id = 0;
-                    $instructor_ids = '0,1'; 
+                    $course_name = $COURSE->fullname;
+                    $primary_instructor_id = $primary_instructor_id;
+                    $instructor_ids = $primary_instructor_id; 
                     $status_id = 1;  
                     $metadata = '';  
 
@@ -150,12 +160,12 @@ class quizaccess_examity_observer {
                         \"metadata\":{}
                     }";
 
-                    var_dump(self::postAPI($url, $event->eventname, $postdata, $headers));die;
+                    var_dump(self::postAPI($url, 'update', $postdata, $headers));die;
 
                 break;
             case '\core\event\course_module_deleted':
                 $url = $url->value . '/courses' . '/' . $event->courseid;
-                self::postAPI($url, $event, $postdata);
+                self::postAPI($url, 'delete', $postdata);
                 break;
             default:
                 return;
@@ -165,12 +175,12 @@ class quizaccess_examity_observer {
     //
     // Run curl on examity's bridge api 
     //
-    public static function postAPI($url, $event=null, $postdata=null, $headers=null, $fullresponse=false, $timeout=300, $connecttimeout=20, $skipcertverify=false) {
+    public static function postAPI($url, $crud=null, $postdata=null, $headers=null, $fullresponse=false, $timeout=300, $connecttimeout=20, $skipcertverify=false) {
 
         global $CFG;
         $options = array();
 
-        // Only http and https links supported.
+        // Only http and https links supported
         if (!preg_match('|^https?://|i', $url)) {
             if ($fullresponse) {
                 $response = new stdClass();
@@ -203,7 +213,6 @@ class quizaccess_examity_observer {
         }
     
         $options['CURLOPT_CONNECTTIMEOUT'] = $connecttimeout;
-    
         $options['CURLOPT_FOLLOWLOCATION'] = 1;
         $options['CURLOPT_MAXREDIRS'] = 5;
 
@@ -215,24 +224,20 @@ class quizaccess_examity_observer {
         $options['CURLOPT_NOBODY'] = false;
         $options['CURLOPT_TIMEOUT'] = $timeout;
 
-        switch ($event) {
-            case '\core\event\course_module_created':
+        // Create, read, update, delete with curl
+        switch ($crud) {
+            case 'create':
                     $content = $curl->post($url, $postdata, $options);
                 break;
-            case '\core\event\course_module_updated':
+            case 'read':
+                    $content = $curl->get($url, $postdata, $options);
+                break;
+            case 'update':
                     $content = $curl->put($url, $postdata, $options);
                 break;
-            case '\core\event\course_module_deleted':
+            case 'delete':
                     $content = $curl->delete($url, $postdata, $options);
                 break;
-            case 'auth':
-                    $content = $curl->post($url, $postdata, $options);
-                break;
-            case 'get_user':
-                    $content = $curl->get($url, $postdata, $options);
-            case 'create_user':
-                    $content = $curl->post($url, $postdata, $options);
-            break;
             default:
                 return;
         }
