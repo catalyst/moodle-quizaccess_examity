@@ -40,6 +40,9 @@
 
 namespace quizaccess_examity;
 
+use curl;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -202,7 +205,7 @@ class helper {
      *
      * @return string
      */
-    public function get_examity_token() {
+    public static function get_examity_token($url, $username, $password) {
 
         $validation_data = "{
             \"client_id\":171,
@@ -305,7 +308,7 @@ class helper {
 
         $examity_course = null;
 
-        return $examity_user
+        return $examity_user;
     }
 
     /**
@@ -381,7 +384,7 @@ class helper {
             \"metadata\":{}
         }";
 
-        return isset(self::post_api($url, 'update', $postdata, $headers)) ?? null; 
+        return self::post_api($url, 'update', $postdata, $headers) ?? null; 
     }
 
     /**

@@ -39,6 +39,7 @@ use quizaccess_examity\helper;
 class quizaccess_examity_observer {
 
     public static function update(\core\event\base $event) {
+
         
         global $DB;
         global $COURSE;
@@ -57,51 +58,51 @@ class quizaccess_examity_observer {
         $url            = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
         $moodle_course  = $DB->get_record('examity_courses', ['moodle_course_id' => $moodle_course_id]);
         $moodle_user    = $DB->get_record('examity_users', ['moodle_user_id' => $moodle_user_id]);
-        $exam_id        = $DB->get_record('examity_exams', ['moodle_exam_id' => $event]);
+        // $exam_id        = $DB->get_record('examity_exams', ['moodle_exam_id' => $event]);
+
 
         //
         // Connect to examity auth
         // 
-        $examity_token = helper::get_examity_token();
+        $examity_token = helper::get_examity_token($url, $username, $password);
         $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
 
-        // Testing examity api //
+        var_dump($examity_token);die;
+        // // get_examity_user
+        // $examity_user = helper::get_examity_user($moodle_user, $headers);
 
-        // get_examity_user
-        $examity_user = helper::get_examity_user($moodle_user, $headers);
+        // // get_examity_course
+        // $examity_course = helper::get_examity_course($moodle_user, $moodle_course, $headers);
 
-        // get_examity_course
-        $examity_course = helper::get_examity_course($moodle_user, $moodle_course, $headers);
+        // // get_examity_exam
+        // $examity_exam = helper::get_examity_exam($examity_user, $examity_course, $headers);
 
-        // get_examity_exam
-        $examity_exam = helper::get_examity_exam($examity_user, $examity_course, $headers);
+        // // create_examity_user
+        // $examity_user = helper::create_examity_user($moodle_user, $headers);
 
-        // create_examity_user
-        $examity_user = helper::create_examity_user($moodle_user, $headers);
+        // // create_examity_course
+        // $examity_course = helper::create_examity_course($examity_user, $moodle_course, $headers);
 
-        // create_examity_course
-        $examity_course = helper::create_examity_course($examity_user, $moodle_course, $headers);
+        // // create_examity_exam
+        // $examity_exam = helper::create_examity_exam($moodle_user, $examity_course, $headers);
 
-        // create_examity_exam
-        $examity_exam = helper::create_examity_exam($moodle_user, $examity_course, $headers);
+        // // update_examity_user
+        // $examity_user = helper::update_examity_user($moodle_user, $headers);
 
-        // update_examity_user
-        $examity_user = helper::update_examity_user($moodle_user, $headers);
+        // // update_examity_course
+        // $examity_course = helper::update_examity_course($examity_user, $moodle_course, $headers);
 
-        // update_examity_course
-        $examity_course = helper::update_examity_course($examity_user, $moodle_course, $headers);
+        // // update_examity_exam
+        // $examity_exam = helper::update_examity_exam($examity_exam, $examity_course, $headers);
 
-        // update_examity_exam
-        $examity_exam = helper::update_examity_exam($examity_exam, $examity_course, $headers);
+        // // delete_examity_user
+        // $examity_user = helper::delete_examity_user($examity_user, $headers);
 
-        // delete_examity_user
-        $examity_user = helper::delete_examity_user($examity_user, $headers);
+        // // delete_examity_course
+        // $examity_course = helper::delete_examity_course($examity_course, $headers);
 
-        // delete_examity_course
-        $examity_course = helper::delete_examity_course($examity_course, $headers);
-
-        // delete_examity_exam
-        $examity_exam = helper::delete_examity_exam($examity_exam, $headers);
+        // // delete_examity_exam
+        // $examity_exam = helper::delete_examity_exam($examity_exam, $headers);
 
         //
         // Run curl requests based on moodle event, ie create course, update, delete etc
@@ -112,7 +113,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get a user based on the moodle_user else create one
                     //
-                    $examity_user = isset(helper::get_examity_user($moodle_user, $headers)) ?? null;
+                    $examity_user = helper::get_examity_user($moodle_user, $headers) ?? null;
 
                     if($examity_user == null) {
                         $examity_user = helper::create_examity_user($moodle_user, $headers);
@@ -121,7 +122,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get course based on moodle_course else create one
                     //
-                    $examity_course = isset(helper::get_examity_course($moodle_user, $moodle_course, $headers)) ?? null;
+                    $examity_course = helper::get_examity_course($moodle_user, $moodle_course, $headers) ?? null;
 
                     if($examity_course == null) {
                         $examity_course = helper::create_examity_course($examity_user, $moodle_course, $headers);
@@ -130,7 +131,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get course based on moodle_course
                     //
-                    $examity_exam = isset(helper::get_examity_exam($examity_user, $examity_course, $headers)) ?? null;
+                    $examity_exam = helper::get_examity_exam($examity_user, $examity_course, $headers) ?? null;
 
                     if($examity_exam == null) {
                         $examity_exam = helper::create_examity_exam($moodle_user, $examity_course, $headers);
@@ -142,7 +143,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get a user based on the moodle_user
                     //
-                    $examity_user = isset(helper::get_examity_user($moodle_user, $headers)) ?? null;
+                    $examity_user = helper::get_examity_user($moodle_user, $headers) ?? null;
 
                     if($examity_user == null) {
                         $examity_user = helper::create_examity_user($moodle_user, $headers);
@@ -151,7 +152,7 @@ class quizaccess_examity_observer {
                     //
                     // update a course in examity
                     //
-                    $examity_course = isset(helper::get_examity_course($moodle_user, $moodle_course, $headers)) ?? null;
+                    $examity_course = helper::get_examity_course($moodle_user, $moodle_course, $headers) ?? null;
 
                     if($examity_course == null) {
 
@@ -168,7 +169,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
                     //
-                    $examity_exam = isset(helper::get_examity_exam($examity_user, $examity_course, $headers)) ?? null;
+                    $examity_exam = helper::get_examity_exam($examity_user, $examity_course, $headers) ?? null;
 
                     if($examity_exam == null) {
 
@@ -186,7 +187,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get a user based on the moodle_user
                     //
-                    $examity_user = isset(helper::get_examity_user($moodle_user, $headers)) ?? null;
+                    $examity_user = helper::get_examity_user($moodle_user, $headers) ?? null;
 
                     if($examity_user == null) {
                         return null;
@@ -195,7 +196,7 @@ class quizaccess_examity_observer {
                     //
                     // delete course in examity
                     //
-                    $examity_course = isset(helper::get_examity_course($moodle_user, $moodle_course, $headers)) ?? null;
+                    $examity_course = helper::get_examity_course($moodle_user, $moodle_course, $headers) ?? null;
 
                     if($examity_course == null) {
 
@@ -210,7 +211,7 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
                     //
-                    $examity_exam = isset(helper::get_examity_exam($examity_user, $examity_course, $headers)) ?? null;
+                    $examity_exam = helper::get_examity_exam($examity_user, $examity_course, $headers) ?? null;
 
                     if($examity_exam == null) {
 
