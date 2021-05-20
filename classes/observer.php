@@ -15,6 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// postAPI -- change this to be post_api
+// get_examity_token
+// get_examity_user
+// get_examity_course
+// get_examity_exam
+// create_examity_user
+// create_examity_course
+// create_examity_exam
+// update_examity_user
+// update_examity_course
+// update_examity_exam
+// delete_examity_user
+// delete_examity_course
+// delete_examity_exam
+
 /**
  * Examity / Moodle integration 
  * @package    quizaccess_examity
@@ -52,68 +67,52 @@ class quizaccess_examity_observer {
         $username = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
         $password = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
         $url      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
-        $course   = $DB->get_record('examity_courses', ['moodle_course_id' => $moodle_course_id]);
-        $user     = $DB->get_record('examity_users', ['moodle_user_id' => $moodle_user_id]);
+        $moodle_course   = $DB->get_record('examity_courses', ['moodle_course_id' => $moodle_course_id]);
+        $moodle_user     = $DB->get_record('examity_users', ['moodle_user_id' => $moodle_user_id]);
         // $exam_id      = $DB->get_record('examity_exams', ['moodle_exam_id' => $event]);
 
         //
         // Connect to examity auth
-        //
-        $validation_data = "{
-            \"client_id\":171,
-            \"username\":\"$username->value\",
-            \"password\":\"$password->value\"
-        }";
-        $token = self::postAPI($url->value .'/auth', 'create', $validation_data);
-        $token_arr = json_decode($token, true);
-        $headers['Authorization'] = ' Bearer '. $token_arr["access_token"];
+        // 
+        $examity_token = self::get_examity_token();
+        $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
 
-        //
-        // Get or create a course creator to use to create a course in examity
-        //
-        if($user) {
+        // get_examity_user
+        $examity_user = self::get_examity_user($moodle_user, $headers);
 
-            // Check for existing instructor from Examity based on course creator ID eg. 107151
-            $examity_user_id = (int)$user->examity_user_id ?? null;
-            $primary_instructor_id = self::postAPI($url->value .'/users' . '/' . $examity_user_id, 'read', null, $headers);
-            $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
-            $primary_instructor_id = $primary_instructor_id_arr['user_id'];
+        // get_examity_course
+        $examity_course = self::get_examity_course($moodle_user, $moodle_course, $headers);
 
-        } else {
+        // get_examity_exam
+        $examity_exam = self::get_examity_exam($examity_user, $examity_course, $headers);
 
-            // No user in DB, indicating no user in examity, so create one 
-            $first_name = $USER->firstname;
-            $last_name = $USER->lastname;
-            $email = $USER->email;
-            $role_id = 3;
-            $id_photo = ''; 
-            $phone = $USER->phone1;  
-            $country_code = (int)$USER->country;  
-            $timezone_id = (int)$USER->timezone;  
-            $metadata = '';  
-            $username =  $USER->username;  
-            $send_password_reset_email = true;  
+        // create_examity_user
+        $examity_user = self::create_examity_user($moodle_user, $headers);
 
-            $postdata = "{
-                            \"first_name\":\"$first_name\",
-                            \"last_name\":\"$last_name\",
-                            \"email\":\"$email\",
-                            \"role_id\":$role_id,
-                            \"id_photo\":\"$id_photo\",
-                            \"phone\":\"$phone\",
-                            \"country_code\":$country_code,
-                            \"timezone_id\":$timezone_id,
-                            \"metadata\":{},
-                            \"username\":\"$username\",
-                            \"send_password_reset_email\":$send_password_reset_email
-                        }";
+        // create_examity_course
+        $examity_course = self::create_examity_course($examity_user, $moodle_course, $headers);
 
-            $user = self::postAPI($url->value . '/users', 'create', $postdata, $headers);
+        // create_examity_exam
+        $examity_exam = self::create_examity_exam($moodle_user, $examity_course, $headers);
 
-            // Create a record of the user and the examity user in the DB
-            var_dump($user);die;
-            $primary_instructor_id = (int)$user['user_id'] ?? null;
-        }
+        // update_examity_user
+        $examity_user = self::update_examity_user($moodle_user, $headers);
+
+        // update_examity_course
+        $examity_course = self::update_examity_course($examity_user, $moodle_course, $headers);
+
+        // update_examity_exam
+        $examity_exam = self::update_examity_exam($examity_exam, $examity_course, $headers);
+
+        // delete_examity_user
+        $examity_user = self::delete_examity_user($examity_user, $headers);
+
+        // delete_examity_course
+        $examity_course = self::delete_examity_course($examity_course, $headers);
+
+        // delete_examity_exam
+        $examity_exam = self::delete_examity_exam($examity_exam, $headers);
+
 
         //
         // Run curl requests based on moodle event, ie create course, update, delete etc
@@ -121,51 +120,119 @@ class quizaccess_examity_observer {
         switch ($event->eventname) {
             case '\core\event\course_module_created': // Triggers when quiz is selected as a course activity
 
-                    $url = $url->value . '/courses';
-                    $course_code = $examity_course_id;
-                    $course_name = 'test course name';
-                    $primary_instructor_id = $primary_instructor_id;
-                    $instructor_ids = $primary_instructor_id; 
-                    $status_id = 1;  
-                    $metadata = '';  
+                    //
+                    // ask examity to get a user based on the moodle_user else create one
+                    //
+                    $examity_user = isset(self::get_examity_user($moodle_user, $headers)) ?? null;
 
-                    $postdata = "{
-                                    \"course_code\":\"$course_code\",
-                                    \"course_name\":\"$course_name\",
-                                    \"primary_instructor_id\":$primary_instructor_id,
-                                    \"instructor_ids\":[$instructor_ids],
-                                    \"status_id\":$status_id,
-                                    \"metadata\":{}
-                                }";
+                    if($examity_user == null) {
+                        $examity_user = self::create_examity_user($moodle_user, $headers);
+                    }
 
-                    var_dump(self::postAPI($url, 'create', $postdata, $headers));die;
+                    //
+                    // ask examity to get course based on moodle_course else create one
+                    //
+                    $examity_course = isset(self::get_examity_course($moodle_user, $moodle_course, $headers)) ?? null;
+
+                    if($examity_course == null) {
+                        $examity_course = self::create_examity_course($examity_user, $moodle_course, $headers);
+                    }
+
+                    //
+                    // ask examity to get course based on moodle_course
+                    //
+                    $examity_exam = isset(self::get_examity_exam($examity_user, $examity_course, $headers)) ?? null;
+
+                    if($examity_exam == null) {
+                        $examity_exam = self::create_examity_exam($moodle_user, $examity_course, $headers);
+                    }
 
                 break;
-            case '\core\event\course_module_updated':
+            case '\core\event\course_module_updated': // Triggers when course is updated
 
-                    $url = $url->value . '/courses';
-                    $course_code = '171';
-                    $course_name = $COURSE->fullname;
-                    $primary_instructor_id = $primary_instructor_id;
-                    $instructor_ids = $primary_instructor_id; 
-                    $status_id = 1;  
-                    $metadata = '';  
+                    //
+                    // ask examity to get a user based on the moodle_user
+                    //
+                    $examity_user = isset(self::get_examity_user($moodle_user, $headers)) ?? null;
 
-                    $postdata = "{
-                        \"course_code\":\"$course_code\",
-                        \"course_name\":\"$course_name\",
-                        \"primary_instructor_id\":$primary_instructor_id,
-                        \"instructor_ids\":[$instructor_ids],
-                        \"status_id\":$status_id,
-                        \"metadata\":{}
-                    }";
+                    if($examity_user == null) {
+                        $examity_user = self::create_examity_user($moodle_user, $headers);
+                    }
+                    
+                    //
+                    // update a course in examity
+                    //
+                    $examity_course = isset(self::get_examity_course($moodle_user, $moodle_course, $headers)) ?? null;
 
-                    var_dump(self::postAPI($url, 'update', $postdata, $headers));die;
+                    if($examity_course == null) {
+
+                        // TODO: if there is no existing course in examity return because we can't find course to update 
+                        continue;
+                        
+                    } else {
+
+                        // TODO: try catch here / update course 
+                        $examity_course = self::update_examity_course($examity_user, $moodle_course, $headers);
+
+                    }
+
+                    //
+                    // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
+                    //
+                    $examity_exam = isset(self::get_examity_exam($examity_user, $examity_course, $headers)) ?? null;
+
+                    if($examity_exam == null) {
+
+                        // if there is no existing exam in examity create one
+                        continue;
+                    } else {
+
+                        // update the exam
+                        $examity_exam = self::update_examity_exam($examity_exam, $examity_course, $headers);
+                    }
 
                 break;
             case '\core\event\course_module_deleted':
-                $url = $url->value . '/courses' . '/' . $event->courseid;
-                self::postAPI($url, 'delete', $postdata);
+
+                    //
+                    // ask examity to get a user based on the moodle_user
+                    //
+                    $examity_user = isset(self::get_examity_user($moodle_user, $headers)) ?? null;
+
+                    if($examity_user == null) {
+                        return null;
+                    }
+                    
+                    //
+                    // delete course in examity
+                    //
+                    $examity_course = isset(self::get_examity_course($moodle_user, $moodle_course, $headers)) ?? null;
+
+                    if($examity_course == null) {
+
+                        // TODO: if there is no existing course in examity return because we can't find course to update 
+                        continue;
+                        
+                    } else {
+                        // delete_examity_course
+                        $examity_course = self::delete_examity_course($examity_course, $headers);
+                    }
+
+                    //
+                    // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
+                    //
+                    $examity_exam = isset(self::get_examity_exam($examity_user, $examity_course, $headers)) ?? null;
+
+                    if($examity_exam == null) {
+
+                        // if there is no existing exam in examity create one
+                        continue;
+                    } else {
+
+                        // update the exam
+                        $examity_exam = self::delete_examity_exam($examity_exam, $headers);
+                    }
+
                 break;
             default:
                 return;
@@ -306,6 +373,160 @@ class quizaccess_examity_observer {
         // }
 
         return $response->results;
+    }
+
+    //
+    // Connect to examity auth
+    //
+    public function get_examity_token() {
+
+        $validation_data = "{
+            \"client_id\":171,
+            \"username\":\"$username->value\",
+            \"password\":\"$password->value\"
+        }";
+        $token = self::postAPI($url->value .'/auth', 'create', $validation_data);
+        $examity_token = json_decode($token, true);
+
+        return $examity_token;
+    }
+
+    public function get_examity_user($moodle_user, $headers) {
+
+        if($moodle_user) {
+
+            // Check for existing instructor from Examity based on course creator ID eg. 107151
+            $examity_user_id = (int)$moodle_user->examity_user_id ?? null;
+            $primary_instructor_id = self::postAPI($url->value .'/users' . '/' . $examity_user_id, 'read', null, $headers);
+            $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
+            $primary_instructor_id = $primary_instructor_id_arr['user_id'];
+            $examity_user = $primary_instructor_id_arr;
+
+        } else {
+
+            $examity_user = null;
+        }
+
+        return $examity_user;
+    }
+
+    public function get_examity_course($moodle_user, $moodle_course, $headers) {
+         
+        //TODO: if already exists return early with this course id
+
+        $url = $url->value . '/courses';
+        $course_code = $examity_course_id;
+        $course_name = 'test course name';
+        $primary_instructor_id = $primary_instructor_id;
+        $instructor_ids = $primary_instructor_id; 
+        $status_id = 1;  
+        $metadata = '';  
+
+        $postdata = "{
+                        \"course_code\":\"$course_code\",
+                        \"course_name\":\"$course_name\",
+                        \"primary_instructor_id\":$primary_instructor_id,
+                        \"instructor_ids\":[$instructor_ids],
+                        \"status_id\":$status_id,
+                        \"metadata\":{}
+                    }";
+
+        return self::postAPI($url, 'create', $postdata, $headers);
+    }
+
+    public function get_examity_exam($examity_user, $moodle_course, $headers){
+
+        $examity_exam = null;
+        $examity_exam_id = null;
+        //TODO: get exam id
+
+        $url = $url->value . '/exams' . $examity_exam_id;
+
+        $examity_exam = self::postAPI($url, 'read', $postdata, $headers);
+
+        return $examity_exam;
+    }
+
+    public function create_examity_user ($moodle_user, $headers) {
+
+        $examity_course = null;
+
+        return $examity_user
+    }
+
+    public function create_examity_course($examity_course, $examidity_user, $moodle_course, $headers) {
+
+        $examity_course = null;
+
+        return $examity_course;
+    }
+
+    public function create_examity_exam($moodle_user, $examity_course, $headers) {
+
+        $examity_exam = null;
+
+        return $examity_exam;
+    }
+
+    public function update_examity_user($examity_user, $headers) {
+
+        $examity_user = null;
+
+        return $examity_user;
+    }
+
+    public function update_examity_course($examity_user, $moodle_course, $headers) {
+
+        $examity_course = null;
+
+        $url = $url->value . '/courses';
+        $course_code = '171';
+        $course_name = $COURSE->fullname;
+        $primary_instructor_id = $primary_instructor_id;
+        $instructor_ids = $primary_instructor_id; 
+        $status_id = 1;  
+        $metadata = '';  
+
+        $postdata = "{
+            \"course_code\":\"$course_code\",
+            \"course_name\":\"$course_name\",
+            \"primary_instructor_id\":$primary_instructor_id,
+            \"instructor_ids\":[$instructor_ids],
+            \"status_id\":$status_id,
+            \"metadata\":{}
+        }";
+
+        return isset(self::postAPI($url, 'update', $postdata, $headers)) ?? null; 
+    }
+
+    public function update_examity_exam($examity_exam, $examity_course, $headers) {
+
+        $examity_exam = null;
+
+        return $examity_exam;
+    }
+
+    public function delete_examity_user($examity_user, $headers) {
+
+        $examity_exam = null;
+
+        return $examity_user;
+    }
+
+    public function delete_examity_course($examity_course, $headers) {
+        $examity_course = null;
+
+        $url = $url->value . '/courses' . '/' . $event->courseid;
+        $examity_course = self::postAPI($url, 'delete', $postdata);
+        
+        return $examity_course;
+    }
+
+    public function delete_examity_exam($examity_exam, $headers) {
+
+        $examity_exam = null;
+
+        return $examity_exam;
     }
     
 }
