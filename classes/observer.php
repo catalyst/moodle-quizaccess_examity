@@ -37,27 +37,46 @@ class quizaccess_examity_observer {
         global $USER;
         global $PAGE;
 
-        $url = null;
+        $consumer_username = null;
+        $consumer_password = null;
+        $client_username = null;
+        $client_password = null;
+        $client_id = null;
         $postdata  = [];
-        $moodle_course_id = (int)$COURSE->id;
-        $moodle_user_id   = (int)$event->userid;
-        $exam_id = $event->other['instanceid'];
+        $url = null;
+
+        $moodle_user_id = (int)$event->userid ?? null;
+        $examity_user_id = null;
+        $moodle_course_id = (int)$COURSE->id ?? null;
+        $examity_course_id = null;
+        $moodle_exam_id = $event->other['instanceid'] ?? null;
+        $examity_exam_id = null;
 
         //
         // Grab essential DB details 
         // 
-        $username       = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'username'], 'value');
-        $password       = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_secret'], 'value');
-        $url            = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'url'], 'value');
-        $moodle_course  = $DB->get_record('examity_courses', ['moodle_course_id' => $moodle_course_id]);
-        $moodle_user    = $DB->get_record('examity_users', ['moodle_user_id' => $moodle_user_id]);
-        $moodle_exam    = $DB->get_record('quiz', ['id' => $exam_id]);
+        $consumer_username      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_username'], 'value');
+        $consumer_password      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_password'], 'value');
+        $client_username        = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_username'], 'value');
+        $client_password        = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_password'], 'value');
+        $client_id              = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_id'], 'value');
+        $url                    = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_url'], 'value');
 
+        
+        $moodle_user_id         = $DB->get_record('quizaccess_examity_data', ['moodle_user_id' => $moodle_user_id]);
+        // $examity_user_id        = $DB->get_record('examity_data', ['examity_user_id' => $examity_user_id]);
+        $moodle_course_id       = $DB->get_record('quizaccess_examity_data', ['moodle_course_id' => $moodle_course_id]);
+        // $examity_course_id      = $DB->get_record('examity_data', ['examity_course_id' => $examity_course_id]);
+        $moodle_exam_id         = $DB->get_record('quizaccess_examity_data', ['moodle_exam_id' => $moodle_exam_id]);
+        // $examity_exam_id        = $DB->get_record('examity_data', ['examity_exam_id' => $examity_exam_id]);
+                
         //
         // Connect to examity auth
         // 
-        $examity_token = helper::get_examity_token($url, $username, $password);
+        $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password);        
         $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
+
+
 
         // get_examity_user
         // $examity_user = helper::get_examity_user($url, $moodle_user, $headers);
@@ -76,7 +95,8 @@ class quizaccess_examity_observer {
         // $examity_course = helper::create_examity_course($url, $moodle_user, $COURSE, $headers);
 
         // // create_examity_exam
-        // $examity_exam = helper::create_examity_exam($url, $moodle_user, $moodle_course, $moodle_exam, $headers);
+        $examity_exam = helper::create_examity_exam($url, $moodle_user, $moodle_course, $moodle_exam, $headers);
+        var_dump($examity_exam);die;
 
         // // update_examity_user
         // $examity_user = helper::update_examity_user($moodle_user, $headers);
@@ -144,7 +164,7 @@ class quizaccess_examity_observer {
                     //
                     // update a course in examity
                     //
-                    $examity_course = helper::get_examity_course($url, $moodle_course, $headers) ?? null;
+                    $examity_course = helper::get_examity_course($url, $moodle_course, $headers);
 
                     if($examity_course != null) {
 
@@ -156,11 +176,11 @@ class quizaccess_examity_observer {
                     //
                     // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
                     //
-                    $examity_exam = helper::get_examity_exam($url, $moodle_course, $headers) ?? null;
+                    $examity_exam = helper::get_examity_exam($url, $moodle_course, $headers);
 
                     if($examity_exam != null) {
 
-                        $examity_exam = helper::get_examity_exam($url, $moodle_course, $headers);
+                        $examity_exam = helper::update_examity_exam($url, $moodle_exam, $moodle_course, $headers);
                     } 
 
                 break;
