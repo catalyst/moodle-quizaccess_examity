@@ -63,58 +63,68 @@ class quizaccess_examity_observer {
         $url                    = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_url'], 'value');
 
         
-        $moodle_user_id         = $DB->get_record('quizaccess_examity_data', ['moodle_user_id' => $moodle_user_id]);
-        // $examity_user_id        = $DB->get_record('examity_data', ['examity_user_id' => $examity_user_id]);
-        $moodle_course_id       = $DB->get_record('quizaccess_examity_data', ['moodle_course_id' => $moodle_course_id]);
-        // $examity_course_id      = $DB->get_record('examity_data', ['examity_course_id' => $examity_course_id]);
-        $moodle_exam_id         = $DB->get_record('quizaccess_examity_data', ['moodle_exam_id' => $moodle_exam_id]);
-        // $examity_exam_id        = $DB->get_record('examity_data', ['examity_exam_id' => $examity_exam_id]);
-                
+        // $moodle_user_id         = $DB->get_record('quizaccess_examity_data', ['moodle_user_id' => $moodle_user_id]);
+        // $examity_user_id        = $DB->get_record('quizaccess_examity_data', ['examity_user_id' => $examity_user_id]);
+        // $moodle_course_id       = $DB->get_record('quizaccess_examity_data', ['moodle_course_id' => $moodle_course_id]);
+        // $examity_course_id      = $DB->get_record('quizaccess_examity_data', ['examity_course_id' => $examity_course_id]);
+        // $moodle_exam_id         = $DB->get_record('quizaccess_examity_data', ['moodle_exam_id' => $moodle_exam_id]);
+        // $examity_exam_id        = $DB->get_record('quizaccess_examity_data', ['examity_exam_id' => $examity_exam_id]);
+
+
+
+        // create user and insert details into the database
+        // $insert = new stdClass();
+        // $insert->moodle_user_id = $moodle_user_id;
+        // $insert->examity_user_id = $examity_user_id;
+        // $insert->moodle_course_id = $moodle_course_id;
+        // $insert->examity_course_id = $examity_course_id;
+        // $insert->moodle_exam_id = $moodle_exam_id;
+        // $insert->examity_exam_id = $examity_exam_id;
+        // insert_record('quizaccess_examity_data', $insert);
+
         //
         // Connect to examity auth
         // 
         $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password);        
         $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
 
-
-
         // get_examity_user
-        // $examity_user = helper::get_examity_user($url, $moodle_user, $headers);
+        // $examity_user = helper::get_examity_user($url, $moodle_user_id, $headers);
+        // var_dump($examity_user);die;
 
         // get_examity_course
-        // $examity_course = helper::get_examity_course($url, $moodle_course, $headers);
+        // $examity_course = helper::get_examity_course($url, $moodle_course_id, $headers);
 
         // // get_examity_exam
-        // $examity_exam = helper::get_examity_exam($url, $moodle_course, $headers);
+        // $examity_exam = helper::get_examity_exam($url, $moodle_exam_id, $headers);
         // var_dump($examity_exam);die;
 
         // create_examity_user
         // $examity_user = helper::create_examity_user($url, $USER, $headers);
 
         // create_examity_course
-        // $examity_course = helper::create_examity_course($url, $moodle_user, $COURSE, $headers);
+        // $examity_course = helper::create_examity_course($url, $moodle_user_id, $COURSE, $headers);
 
         // // create_examity_exam
-        $examity_exam = helper::create_examity_exam($url, $moodle_user, $moodle_course, $moodle_exam, $headers);
-        var_dump($examity_exam);die;
+        // $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
 
         // // update_examity_user
-        // $examity_user = helper::update_examity_user($moodle_user, $headers);
+        // $examity_user = helper::update_examity_user($url, $moodle_user_id, $headers);
 
         // // update_examity_course
-        // $examity_course = helper::update_examity_course($examity_user, $moodle_course, $headers);
+        // $examity_course = helper::update_examity_course($url, $moodle_user_id, $moodle_course_id, $headers);
 
         // // update_examity_exam
-        // $examity_exam = helper::update_examity_exam($examity_exam, $examity_course, $headers);
+        // $examity_exam = helper::update_examity_exam($url, $moodle_course_id, $moodle_exam_id, $headers);
 
         // // delete_examity_user
-        // $examity_user = helper::delete_examity_user($examity_user, $headers);
+        // $examity_user = helper::delete_examity_user($url, $moodle_user_id, $headers);
 
         // delete_examity_course
-        // $examity_course = helper::delete_examity_course($url, $moodle_course, $headers);
+        // $examity_course = helper::delete_examity_course($url, $moodle_course_id, $headers);
 
         // // delete_examity_exam
-        // $examity_exam = helper::delete_examity_exam($examity_exam, $headers);
+        // $examity_exam = helper::delete_examity_exam($url, $moodle_exam_id, $headers);
 
         //
         // Run curl requests based on moodle event, ie create course, update, delete etc
@@ -124,29 +134,34 @@ class quizaccess_examity_observer {
 
                     //
                     // ask examity to get a user based on the moodle_user else create one
+                    //  id | moodle_user_id | examity_user_id | moodle_course_id | examity_course_id | moodle_exam_id | examity_exam_id 
                     //
-                    $examity_user = helper::get_examity_user($url, $moodle_user, $headers) ?? null;
 
-                    if($examity_user == null) {
+                    $moodle_user_id = 3;
+                    $examity_user = $DB->get_record('quizaccess_examity_data', ['moodle_user_id' => $moodle_user_id]);
+
+                    if(!$examity_user) {
                         $examity_user = helper::create_examity_user($url, $USER, $headers);
+
+                        var_dump($examity_user);die;
                     }
 
                     //
                     // ask examity to get a course based on moodle_course else create one
                     //
-                    $examity_course = helper::get_examity_course($url, $moodle_course, $headers) ?? null;
+                    $examity_course = $DB->get_record('quizaccess_examity_data', ['examity_course_id' => $examity_course_id]) ?? null;
 
                     if($examity_course == null) {
-                        $examity_course = helper::create_examity_course($url, $moodle_user, $COURSE, $headers);
+                        $examity_course = helper::create_examity_course($url, $moodle_user_id, $COURSE, $headers);
                     }
 
                     //
                     // ask examity to get exam based on moodle_exam
                     //
-                    $examity_exam = helper::get_examity_exam($url, $moodle_exam, $moodle_course, $headers) ?? null;
+                    $examity_exam = $DB->get_record('quizaccess_examity_data', ['examity_exam_id' => $examity_exam_id]) ?? null;
 
                     if($examity_exam == null) {
-                        $examity_exam = helper::create_examity_exam($url, $moodle_user, $moodle_course, $moodle_exam, $headers);
+                        $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
                     }
 
                 break;
@@ -164,7 +179,7 @@ class quizaccess_examity_observer {
                     //
                     // update a course in examity
                     //
-                    $examity_course = helper::get_examity_course($url, $moodle_course, $headers);
+                    $examity_course =  $DB->get_record('quizaccess_examity_data', ['examity_user_id' => $examity_course_id]) ?? null;
 
                     if($examity_course != null) {
 
