@@ -630,6 +630,20 @@ class helper {
 
         $id = $DB->insert_record($db_table, $data_object, $returnid=true);
         return $id;
+    }
+    
+    public static function update($data, $db_table) {
+
+        global $DB;
+        $id = null;
+
+        $data_object = new stdClass();
+        foreach($data as $key => $value) {
+            $data_object->$key = optional_param($key, $value, PARAM_INT);
+        }
+
+        $id = $DB->update_record($db_table, $data_object, $returnid=true);
+        return $id;
     } 
 
 }
