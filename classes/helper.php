@@ -285,15 +285,14 @@ class helper {
         $timezone_id = (int)$USER->timezone;
         $url = $url->value . '/users';
 
-
         $firstname      = $USER->firstname;
         $lastname       = $USER->lastname;
-        $email          = 'blah3@gmail.com';//$USER->email;
+        $email          = 'blah6@gmail.com';//$USER->email;
         $picture        = $USER->picture;
         $phone2         = $USER->phone2;
         $country        = $USER->country;
         $timezone       = $USER->timezone;
-        $username       = 'blah3';//$USER->username;
+        $username       = 'blah6';//$USER->username;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
@@ -314,7 +313,6 @@ class helper {
 
         $examity_user_id = $examity_user['user_id'] ?? null;
 
-        var_dump($examity_user);die;
         return $examity_user;
     }
 
@@ -328,6 +326,8 @@ class helper {
      * @return object
      */
     public static function create_examity_course($url, $moodle_user_id, $COURSE, $headers) {
+
+        var_dump($moodle_user_id);die;
 
         $url = $url->value . '/courses';
         $primary_instructor_id = (int)$moodle_user_id->examity_user_id ?? null;

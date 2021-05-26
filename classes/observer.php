@@ -63,7 +63,7 @@ class quizaccess_examity_observer {
         $url                    = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_url'], 'value');
 
         // Check whether the user, course or exam is already existing in the db
-        $examity_user_id        = $DB->get_record('examity_user', ['moodle_user_id' => $moodle_course_id]);
+        $examity_user_id        = $DB->get_record('examity_user', ['moodle_user_id' => $moodle_user_id]);
         $examity_course_id      = $DB->get_record('examity_course', ['moodle_course_id' => $moodle_course_id]);
         $examity_exam_id        = $DB->get_record('examity_exam', ['moodle_exam_id' => $moodle_exam_id]);
 
@@ -142,7 +142,7 @@ class quizaccess_examity_observer {
 
                         $examity_user_id = helper::create_examity_user($url, $USER, $headers) ?? null;
 
-                        if($examity_user_id != null){
+                        if(isset($examity_user_id['user_id'])){
 
                             $data = [
                                 'id' => null,
@@ -151,6 +151,7 @@ class quizaccess_examity_observer {
                             ];
     
                             $insert = helper::insert($data, 'examity_user');
+
                             if($insert == false){
                                 return null;
                             }
@@ -166,7 +167,7 @@ class quizaccess_examity_observer {
                     //
                     if(!$examity_course_id) {
 
-                        $examity_course_id = helper::create_examity_course($url, $moodle_user_id, $COURSE, $headers);
+                        $examity_course_id = helper::create_examity_course($url, $moodle_user_id, $COURSE, $headers) ?? null;
 
                         if($examity_user_id != null){
 
