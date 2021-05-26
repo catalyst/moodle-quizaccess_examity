@@ -39,12 +39,12 @@
  */
 
 namespace quizaccess_examity;
-
 use curl;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
+global $CFG, $DB;
 
+defined('MOODLE_INTERNAL') || die();
 class helper {
 
     /**
@@ -617,6 +617,20 @@ class helper {
         
         return $examity_exam;
     }
+
+    public static function insert($data, $db_table) {
+
+        global $DB;
+        $id = null;
+
+        $data_object = new stdClass();
+        foreach($data as $key => $value) {
+            $data_object->$key = optional_param($key, $value, PARAM_INT);
+        }
+
+        $id = $DB->insert_record($db_table, $data_object, $returnid=true);
+        return $id;
+    } 
 
 }
 
