@@ -457,14 +457,16 @@ class helper {
      * @param int $examity_user moodle user id.
      * @param object $moodle_course moodle course.
      * @param array $headers set token in header.
-     * @return object
+     * @return int $examity_course
      */
-    public static function update_examity_course($url, $moodle_user_id, $moodle_course_id, $headers) {
+    public static function update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers) {
 
         $examity_course = null;
 
-        $url = $url->value . '/courses';
-        $course_id        = 4;
+        // var_dump($examity_course_id);die;
+
+        $url = $url->value . '/courses' . '/' . (int)$examity_course_id;
+        $course_id        = $examity_course_id;
         $duration         = 10;
         $exam_end_date    ='2021-05-24T21:39:48.586Z'; 
         $rule_id          = 0;
@@ -482,6 +484,7 @@ class helper {
         $exam_password    = 'password';
         $exam_username    = 'username';
         $is_student_upload_file = true;
+        $instructor_ids = $examity_user_id;
         $userId = null;
         $testtakerUrl = null;
         $proctorUrl = null;
@@ -489,27 +492,17 @@ class helper {
         $duration = null;
 
         $postdata = "{
-                        \"course_id\":$course_id,
-                        \"duration\":25,
-                        \"exam_end_date\":\"$exam_end_date\",
-                        \"exam_instructions\":[
-                        ],
-                        \"exam_level_id\":$exam_level_id,
-                        \"exam_name\":\"$exam_name\",
-                        \"exam_start_date\":\"$exam_start_date\",
-                        \"exam_url\":\"$exam_url\",
-                        \"status_id\":$status_id,
-                        \"allowed_attempts\":$allowed_attempts,
-                        \"exam_code\":\"$exam_code\",
-                        \"exam_password\":\"$exam_password\",
-                        \"exam_username\":\"$exam_username\",
-                        \"is_student_upload_file\":$is_student_upload_file,
-                        \"metadata\": null,
-                        \"unique_exam_urls\":[
-                        ]
+                        \"course_code\":\"$examity_course_id\",
+                        \"course_name\":\"$COURSE->fullname\",
+                        \"primary_instructor_id\":$examity_user_id,
+                        \"instructor_ids\":[2],
+                        \"status_id\":1,
+                        \"metadata\":{}
                     }";
 
-        return self::post_api($url, 'update', $postdata, $headers) ?? null; 
+        $examity_course = self::post_api($url, 'update', $postdata, $headers) ?? null;
+
+        return $examity_user_id; 
     }
 
     /**
@@ -521,14 +514,11 @@ class helper {
      * @param array $headers set token in header.
      * @return object
      */
-    public static function update_examity_exam($url, $moodle_course_id, $moodle_exam_id, $headers) {
+    public static function update_examity_exam($url, $examity_user_id, $examity_course_id, $examity_exam_id, $headers) {
 
-        // exam ids 6202, 6203
-        $moodle_exam_id = 6202; // TODO: $moodle_exam->id; 
-        $url = $url->value . '/exams' . '/' . (int)$moodle_exam_id;
+        $url = $url->value . '/exams' . '/' . (int)$examity_exam_id;
         $examity_exam     = null;
-
-        $course_id        = 1454;//(int)$moodle_exam->course;
+        $course_id        = $examity_course_id; //(int)$moodle_exam->course;
         $duration         = 25;//(int)$moodle_exam->timeopen - (int)$moodle_exam->timeclose;
         $exam_end_date    = null; //TODO: $moodle_exam->timeclose;
         $rule_id          = 0;
@@ -537,12 +527,12 @@ class helper {
         $for_proctor      = true;
         $display_order    = 0;
         $exam_level_id    = 10;
-        $exam_name        = 'test_examity';// $moodle_exam->name;
+        $exam_name        = 'test_examity'.$examity_exam_id;// $moodle_exam->name;
         $exam_start_date  = '2021-05-01T04:00:00'; //TODO: $moodle_exam->timeopen;
         $exam_url         = 'https://test.examity.com/onlineexam/'; //TODO: get the exam url
         $status_id        = 1;
         $allowed_attempts = 0;
-        $exam_code        = null;
+        $exam_code        = $examity_exam_id;
         $exam_password    = 'password';// $moodle_exam->password;
         $exam_username    = 'username';
         $is_student_upload_file = true;
@@ -553,39 +543,58 @@ class helper {
         $duration = null;//0;
 
         $postdata = "{
-                        \"course_id\":$course_id,
-                        \"duration\":$duration,
-                        \"exam_end_date\":\"$exam_end_date\",
-                        \"exam_instructions\":[
-                            {
-                                \"rule_id\":$rule_id,
-                                \"rule_description\":\"$rule_description\",
-                                \"for_student\":$for_student,
-                                \"for_proctor\":$for_proctor,
-                                \"display_order\":$display_order
-                            }
-                        ],
-                        \"exam_level_id\":$exam_level_id,
+                        \"duration\":25,
+                        \"exam_end_date\":\"2021-05-27T22:31:00.334Z\",
+                        \"exam_instructions\":[],
+                        \"exam_level_id\":4,
                         \"exam_name\":\"$exam_name\",
-                        \"exam_start_date\":\"$exam_start_date\",
+                        \"exam_start_date\":\"2021-05-27T22:31:00.334Z\",
                         \"exam_url\":\"$exam_url\",
-                        \"status_id\":$status_id,
-                        \"allowed_attempts\":$allowed_attempts,
+                        \"status_id\":1,
+                        \"allowed_attempts\":0,
                         \"exam_code\":\"$exam_code\",
                         \"exam_password\":\"$exam_password\",
                         \"exam_username\":\"$exam_username\",
-                        \"is_student_upload_file\":$is_student_upload_file,
-                        \"metadata\": null,
+                        \"is_student_upload_file\":true,
+                        \"metadata\":{},
                         \"unique_exam_urls\":[
-                            {
-                                \"userId\":$userId,
-                                \"testtakerUrl\":\"$testtakerUrl\",
-                                \"proctorUrl\":\"$proctorUrl\",
-                                \"password\":\"$password\",
-                                \"duration\":$duration
-                            }
-                        ]
-                    }";
+                            ]
+                        }";
+
+        // $postdata = "{
+        //                 \"course_id\":$course_id,
+        //                 \"duration\":25,
+        //                 \"exam_end_date\":\"$exam_end_date\",
+        //                 \"exam_instructions\":[
+        //                     {
+        //                         \"rule_id\":$rule_id,
+        //                         \"rule_description\":\"$rule_description\",
+        //                         \"for_student\":$for_student,
+        //                         \"for_proctor\":$for_proctor,
+        //                         \"display_order\":$display_order
+        //                     }
+        //                 ],
+        //                 \"exam_level_id\":$exam_level_id,
+        //                 \"exam_name\":\"$exam_name\",
+        //                 \"exam_start_date\":\"$exam_start_date\",
+        //                 \"exam_url\":\"$exam_url\",
+        //                 \"status_id\":$status_id,
+        //                 \"allowed_attempts\":$allowed_attempts,
+        //                 \"exam_code\":\"$examity_exam_id\",
+        //                 \"exam_password\":\"$exam_password\",
+        //                 \"exam_username\":\"$exam_username\",
+        //                 \"is_student_upload_file\":$is_student_upload_file,
+        //                 \"metadata\": null,
+        //                 \"unique_exam_urls\":[
+        //                     {
+        //                         \"userId\":$userId,
+        //                         \"testtakerUrl\":\"$testtakerUrl\",
+        //                         \"proctorUrl\":\"$proctorUrl\",
+        //                         \"password\":\"$password\",
+        //                         \"duration\":$duration
+        //                     }
+        //                 ]
+        //             }";
 
         $examity_exam = self::post_api($url, 'update', $postdata, $headers); 
 

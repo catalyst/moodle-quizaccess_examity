@@ -264,25 +264,25 @@ class quizaccess_examity_observer {
                     // ask examity to get a user inferred from the moodle_user_id
                     // if examity finds a user, it updates it's $USER data inside examity
                     //
-                    if($examity_user_id) {
-                        $examity_user_id = helper::update_examity_user($url, $USER, $headers) ?? null;
-                    }
+                    // if($examity_user_id) {
+                    //     $examity_user_id = helper::update_examity_user($url, $USER, $headers) ?? null;
+                    // }
                     
                     //
                     // ask examity to get a course infered from the moodle_course_id
                     // if examity finds a course, it updates it's $COURSE data inside examity
                     //
                     if($examity_course_id) {
-                        $examity_course_id = helper::update_examity_course($url, $examity_user_id, $COURSE, $headers) ?? null;
+                        $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers) ?? null;
                     }
 
-                    //
+                    
                     // ask examity to get a course infered from the moodle_course_id
                     // if examity finds a course, it updates it's $COURSE data inside examity
                     //
                     if($examity_exam_id) {
-                        $examity_exam_id = helper::update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
-
+                        $examity_exam_id = helper::update_examity_exam($url, $examity_user_id, $examity_course_id, $examity_exam_id, $headers) ?? null;
+                        var_dump($examity_exam_id);die;
                     } 
 
                 break;
@@ -293,30 +293,30 @@ class quizaccess_examity_observer {
                     //
                     // delete course 
                     //
-                    $examity_course = helper::get_examity_course($url, $examity_course_id, $headers) ?? null;
+                    // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers) ?? null;
 
-                    if(isset($examity_course['course_id'])) {
+                    // if(isset($examity_course['course_id'])) {
 
-                        $examity_course_id = $examity_course['course_id']);
-                        $examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
-                        $delete = helper::delete($examity_course_id, 'examity_course');
+                    //     $examity_course_id = $examity_course['course_id']);
+                    //     $examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
+                    //     $delete = helper::delete($examity_course_id, 'examity_course');
 
-                        // TODO: loop through all exams associated to this course and delete them
+                    //     // TODO: loop through all exams associated to this course and delete them
 
-                    }
+                    // }
 
                     //
                     // delete exam 
                     //
-                    $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers) ?? null;
+                    // $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers) ?? null;
 
-                    if(isset($examity_exam['exam_id'])) {
+                    // if(isset($examity_exam['exam_id'])) {
 
-                        $examity_exam_id = $examity_exam['exam_id']);
-                        $examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                        $delete = helper::delete($examity_exam_id, 'examity_exam');
+                    //     $examity_exam_id = $examity_exam['exam_id']);
+                    //     $examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
+                    //     $delete = helper::delete($examity_exam_id, 'examity_exam');
 
-                    }
+                    // }
 
                 break;
             default:
