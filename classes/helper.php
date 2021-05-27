@@ -201,8 +201,6 @@ class helper {
      */
     public static function get_examity_token($url, $client_id, $username, $password) {
 
-        // var_dump($username);die;
-
         $validation_data = "{
             \"client_id\": $client_id->value,
             \"username\":\"$username->value\",
@@ -222,11 +220,11 @@ class helper {
      * @param array $headers - set token in header.
      * @return array $examity_user - get user data stored in examity.
      */
-    public static function get_examity_user($url, $moodle_user_id, $headers) {
+    public static function get_examity_user($url, $examity_user_id, $headers) {
 
             // Check for existing instructor from Examity based on course creator ID eg. 107151
             $examity_user = null;
-            $examity_user_id = (int)$moodle_user_id->examity_user_id ?? null;
+            $examity_user_id = (int)$examity_user_id ?? null;
             $primary_instructor_id = self::post_api($url->value . '/users' . '/' . $examity_user_id, 'read', null, $headers);
             $primary_instructor_id_arr = json_decode($primary_instructor_id, true);
             $primary_instructor_id = $primary_instructor_id_arr['user_id'];
@@ -241,15 +239,15 @@ class helper {
      * @param object $url - url for the curl request.
      * @param object $moodle_course_id - moodle course.
      * @param array $headers set token in header.
-     * @return string $examity_course - json of course data.
+     * @return string $examity_course_id - json of course data.
      */
-    public static function get_examity_course($url, $examity_course, $headers) {
+    public static function get_examity_course($url, $examity_course_id, $headers) {
 
         $postdata = "";
-        $examity_course_id = (int)$examity_course->examity_course_id ?? null;
+        $examity_course_id = (int)$examity_course_id ?? null;
         $url = $url->value . '/courses' . '/' . $examity_course_id;
         $examity_course = self::post_api($url, 'read', $postdata, $headers) ?? null;
-
+        $examity_course = json_decode($examity_course, true);
         return $examity_course;
     }
 
@@ -261,13 +259,12 @@ class helper {
      * @param array $headers set token in header.
      * @return string $examity_exam - return exam json.
      */
-    public static function get_examity_exam($url, $moodle_exam_id, $headers) {
+    public static function get_examity_exam($url, $examity_exam_id, $headers) {
 
         $postdata = "";
-        $examity_exam_id = $moodle_exam_id; // TODO: get real exam id from saved values in the database
         $url = $url->value . '/exams' . '/' . $examity_exam_id;
         $examity_exam = self::post_api($url, 'read', $postdata, $headers) ?? null;
-
+        $examity_exam = json_decode($examity_exam, true);
         return $examity_exam;
     }
 
@@ -313,7 +310,7 @@ class helper {
 
         $examity_user_id = $examity_user['user_id'] ?? null;
 
-        return $examity_user;
+        return $examity_user_id;
     }
 
     /**
@@ -327,7 +324,7 @@ class helper {
      */
     public static function create_examity_course($url, $examity_user, $COURSE, $headers) {
 
-        $examity_course = null;
+        $examity_course_id = null;
         $url = $url->value . '/courses';
         $primary_instructor_id = (int)$examity_user->examity_user_id ?? null;
 
@@ -346,7 +343,9 @@ class helper {
     
         }
 
-        return $examity_course;
+        $examity_course_id = $examity_course['course_id'] ?? null;
+
+        return $examity_course_id;
     }
 
     /**

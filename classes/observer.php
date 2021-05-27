@@ -64,12 +64,23 @@ class quizaccess_examity_observer {
 
         // Check whether the user, course or exam is already existing in the db
         $examity_user_id        = $DB->get_record('examity_user', ['moodle_user_id' => $moodle_user_id]);
-        $examity_course_id      = $DB->get_record('examity_course', ['moodle_course_id' => $moodle_course_id]);
-        $examity_exam_id        = $DB->get_record('examity_exam', ['moodle_exam_id' => $moodle_exam_id]);
+        if(isset($examity_user_id->examity_user_id)){
+            $examity_user_id = (int)$examity_user_id->examity_user_id;
 
-        $examity_user_course    = $DB->get_record('examity_user_course', ['moodle_user_id' => $moodle_user_id]);
-        $examity_user_exam      = $DB->get_record('examity_user_exam', ['moodle_user_id' => $moodle_user_id]);
-        $examity_course_exam    = $DB->get_record('examity_course_exam', ['moodle_course_id' => $moodle_course_id]);
+        }
+        $examity_course_id      = $DB->get_record('examity_course', ['moodle_course_id' => $moodle_course_id]);
+        if(isset($examity_course_id->examity_course_id)){
+            $examity_course_id = (int)$examity_course_id->examity_course_id;
+        }
+        $examity_exam_id        = $DB->get_record('examity_exam', ['moodle_exam_id' => $moodle_exam_id]);
+        if(isset($examity_exam_id->examity_exam_id)){
+            $examity_exam_id = (int)$examity_exam_id->examity_exam_id;
+        }
+
+
+        // $examity_user_course    = $DB->get_record('examity_user_course', ['moodle_user_id' => $moodle_user_id]);
+        // $examity_user_exam      = $DB->get_record('examity_user_exam', ['moodle_user_id' => $moodle_user_id]);
+        // $examity_course_exam    = $DB->get_record('examity_course_exam', ['moodle_course_id' => $moodle_course_id]);
 
         // create user and insert details into the database
         // $insert = new stdClass();
@@ -88,17 +99,11 @@ class quizaccess_examity_observer {
         $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password);        
         $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
 
-        // get_examity_user
-        // $examity_user = helper::get_examity_user($url, $moodle_user_id, $headers);
-        // var_dump($examity_user);die;
+        // $examity_user = helper::get_examity_user($url, $examity_user_id, $headers);
+        // $examity_user = $examity_user['user_id']);
 
-        // get_examity_course
         // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
-
-        // var_dump($examity_course);die;
-        // // get_examity_exam
-        // $examity_exam = helper::get_examity_exam($url, $moodle_exam_id, $headers);
-        // var_dump($examity_exam);die;
+        // $examity_user = $examity_course['course_id']);
 
         // create_examity_user
         // $examity_user = helper::create_examity_user($url, $USER, $headers);
@@ -218,15 +223,14 @@ class quizaccess_examity_observer {
 
                     // If all of these have values in the custom one to one tables then update the one to many
                     if($user && $course && $exam) {
-
-
+                    
                         // examity_user_course
                         $data = [
                             'id' => null,
                             'moodle_user_id' => $moodle_user_id,
                             'moodle_course_id' => $moodle_course_id,
-                            'examity_user_id' => $examity_user_id->examity_user_id,
-                            'examity_course_id' => $examity_course_id->examity_course_id,
+                            'examity_user_id' => $examity_user_id,
+                            'examity_course_id' => $examity_course_id,
                         ];
 
                         $insert = helper::insert($data, 'examity_user_course');
@@ -236,22 +240,37 @@ class quizaccess_examity_observer {
                             'id' => null,
                             'moodle_user_id' => $moodle_user_id,
                             'moodle_exam_id' => $moodle_exam_id,
-                            'examity_user_id' => $examity_user_id->examity_user_id,
+                            'examity_user_id' => $examity_user_id,
                             'examity_exam_id' => $examity_exam_id,
                         ];
 
-                        $insert = helper::insert($data, 'examity_course_exam');
+                        $insert = helper::insert($data, 'examity_user_exam');
 
+                        $examity_user   = helper::get_examity_user($url, $examity_user_id, $headers);
+                        $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
+                        $examity_exam   = helper::get_examity_exam($url, $examity_exam_id, $headers);
+
+                        // var_dump($examity_user['user_id']);
+                        // var_dump($examity_course['course_id']);
+                        // var_dump($examity_exam['exam_id']);
+
+                        // var_dump('from database..............');
+
+                        // var_dump($examity_user_id);
+                        // var_dump($examity_course_id);
+                        // var_dump($examity_exam_id);die;
+
+                
                         // examity_course_exam
                         $data = [
                             'id' => null,
                             'moodle_course_id' => $moodle_course_id,
                             'moodle_exam_id' => $moodle_exam_id,
-                            'examity_course_id' => $examity_course_id->examity_course_id,
+                            'examity_course_id' => $examity_course_id,
                             'examity_exam_id' => $examity_exam_id,
                         ];
 
-                        $insert = helper::insert($data, 'examity_user_course');
+                        $insert = helper::insert($data, 'examity_course_exam');
 
                     }
 
