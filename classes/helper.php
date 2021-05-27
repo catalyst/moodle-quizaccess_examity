@@ -287,12 +287,12 @@ class helper {
 
         $firstname      = $USER->firstname;
         $lastname       = $USER->lastname;
-        $email          = 'blah6@gmail.com';//$USER->email;
+        $email          = 'blah9@gmail.com';//$USER->email;
         $picture        = $USER->picture;
         $phone2         = $USER->phone2;
         $country        = $USER->country;
         $timezone       = $USER->timezone;
-        $username       = 'blah6';//$USER->username;
+        $username       = 'blah9';//$USER->username;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
@@ -323,26 +323,30 @@ class helper {
      * @param object $moodle_user - moodle user.
      * @param object $COURSE - moodle course.
      * @param array $headers set token in header.
-     * @return object
+     * @return string $examity_course
      */
-    public static function create_examity_course($url, $moodle_user_id, $COURSE, $headers) {
+    public static function create_examity_course($url, $examity_user, $COURSE, $headers) {
 
-        var_dump($moodle_user_id);die;
-
+        $examity_course = null;
         $url = $url->value . '/courses';
-        $primary_instructor_id = (int)$moodle_user_id->examity_user_id ?? null;
+        $primary_instructor_id = (int)$examity_user->examity_user_id ?? null;
 
-        $postdata = "{
-                        \"course_code\":\"string\",
-                        \"course_name\":\"$COURSE->fullname\",
-                        \"primary_instructor_id\":$primary_instructor_id,
-                        \"instructor_ids\":[$primary_instructor_id],
-                        \"status_id\":1,
-                        \"metadata\":{}
-                    }";
+        if($primary_instructor_id){
+            $postdata = "{
+                \"course_code\":\"$COURSE->id\",
+                \"course_name\":\"$COURSE->fullname\",
+                \"primary_instructor_id\":$primary_instructor_id,
+                \"instructor_ids\":[$primary_instructor_id],
+                \"status_id\":1,
+                \"metadata\":{}
+            }";
 
-        $examity_course = self::post_api($url, 'create', $postdata, $headers) ?? null;
+            $examity_course = self::post_api($url, 'create', $postdata, $headers) ?? null;
 
+            $examity_course = json_decode($examity_course, true);
+    
+            $examity_user_id = $examity_course['course_id'] ?? null;
+        }
 
         return $examity_course;
     }
