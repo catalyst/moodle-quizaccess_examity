@@ -233,7 +233,7 @@ class helper {
         return $examity_user;
     }
 
-    /**
+    /**WR355129
      * Get examity course.
      *
      * @param object $url - url for the curl request.

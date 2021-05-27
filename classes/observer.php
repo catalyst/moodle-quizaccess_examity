@@ -45,12 +45,12 @@ class quizaccess_examity_observer {
         $postdata  = [];
         $url = null;
 
-        $moodle_user_id = (int)$event->userid ?? null;
         $examity_user_id = null;
-        $moodle_course_id = (int)$COURSE->id ?? null;
         $examity_course_id = null;
-        $moodle_exam_id = $event->other['instanceid'] ?? null;
         $examity_exam_id = null;
+        $moodle_user_id = (int)$event->userid ?? null;
+        $moodle_course_id = (int)$COURSE->id ?? null;
+        $moodle_exam_id = $event->other['instanceid'] ?? null;
 
         //
         // Grab essential DB details 
@@ -76,22 +76,6 @@ class quizaccess_examity_observer {
         if(isset($examity_exam_id->examity_exam_id)){
             $examity_exam_id = (int)$examity_exam_id->examity_exam_id;
         }
-
-
-        // $examity_user_course    = $DB->get_record('examity_user_course', ['moodle_user_id' => $moodle_user_id]);
-        // $examity_user_exam      = $DB->get_record('examity_user_exam', ['moodle_user_id' => $moodle_user_id]);
-        // $examity_course_exam    = $DB->get_record('examity_course_exam', ['moodle_course_id' => $moodle_course_id]);
-
-        // create user and insert details into the database
-        // $insert = new stdClass();
-        // $insert->moodle_user_id = $moodle_user_id;
-        // $insert->examity_user_id = $examity_user_id;
-        // $insert->moodle_course_id = $moodle_course_id;
-        // $insert->examity_course_id = $examity_course_id;
-        // $insert->moodle_exam_id = $moodle_exam_id;
-        // $insert->examity_exam_id = $examity_exam_id;
-        // insert_record('quizaccess_examity_data', $insert);
-
 
         //
         // Connect to examity auth
