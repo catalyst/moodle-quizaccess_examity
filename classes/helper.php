@@ -613,12 +613,12 @@ class helper {
      * @param array $headers set token in header.
      * @return object
      */
-    public static function delete_examity_course($url, $moodle_course_id, $headers) {
+    public static function delete_examity_course($url, $examity_course_id, $headers) {
 
         $postdata = "";
-        $examity_course_id = (int)$moodle_course_id->examity_course_id ?? null;
         $url = $url->value . '/courses' . '/' . $examity_course_id;
         $examity_course = self::post_api($url, 'delete', $postdata, $headers);
+        $examity_course = json_decode($examity_course, true);
         
         return $examity_course;
     }
@@ -666,6 +666,20 @@ class helper {
         }
 
         $id = $DB->update_record($db_table, $data_object, $returnid=true);
+        return $id;
+    } 
+
+    public static function delete($data, $db_table) {
+
+        global $DB;
+        $id = null;
+
+        $data_object = new stdClass();
+        foreach($data as $key => $value) {
+            $data_object->$key = optional_param($key, $value, PARAM_INT);
+        }
+
+        $id = $DB->delete_record($db_table, $data_object, $returnid=true);
         return $id;
     } 
 

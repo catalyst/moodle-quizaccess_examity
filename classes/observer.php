@@ -271,66 +271,67 @@ class quizaccess_examity_observer {
                         ];
 
                         $insert = helper::insert($data, 'examity_course_exam');
-
                     }
 
                 break;
             case '\core\event\course_module_updated': // Triggers when course is updated
 
                     //
-                    // ask examity to get a user based on the moodle_user
+                    // ask examity to get a user inferred from the moodle_user_id
+                    // if examity finds a user, it updates it's $USER data inside examity
                     //
-                    // $examity_user = helper::get_examity_user($url, $moodle_user, $headers) ?? null;
-
-                    // if($examity_user != null) {
-                    //     $examity_user = helper::create_examity_user($url, $USER, $headers);
-                    // }
+                    if($examity_user_id) {
+                        $examity_user_id = helper::update_examity_user($url, $USER, $headers) ?? null;
+                    }
                     
                     //
-                    // update a course in examity
+                    // ask examity to get a course infered from the moodle_course_id
+                    // if examity finds a course, it updates it's $COURSE data inside examity
                     //
-                    $examity_course =  $DB->get_record('quizaccess_examity_data', ['examity_user_id' => $examity_course_id]) ?? null;
-
-                    if($examity_course != null) {
-
-                        // TODO: try catch here / update course 
-                        $examity_course = helper::update_examity_course($url, $moodle_user, $moodle_course, $headers);
-
+                    if($examity_course_id) {
+                        $examity_course_id = helper::update_examity_course($url, $examity_user_id, $COURSE, $headers) ?? null;
                     }
 
                     //
-                    // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
+                    // ask examity to get a course infered from the moodle_course_id
+                    // if examity finds a course, it updates it's $COURSE data inside examity
                     //
-                    $examity_exam = helper::get_examity_exam($url, $moodle_course, $headers);
+                    if($examity_exam_id) {
+                        $examity_exam_id = helper::update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
 
-                    if($examity_exam != null) {
-
-                        $examity_exam = helper::update_examity_exam($url, $moodle_exam, $moodle_course, $headers);
                     } 
 
                 break;
             case '\core\event\course_module_deleted':
+
+                    //TODO: Hook into events where user is deleted in moodle and remove examity_user_id from the system
                     
                     //
-                    // delete course in examity
+                    // delete course 
                     //
-                    $examity_course = helper::get_examity_course($url, $moodle_course, $headers) ?? null;
+                    $examity_course = helper::get_examity_course($url, $examity_course_id, $headers) ?? null;
 
-                    if($examity_course != null) {
+                    if(isset($examity_course['course_id'])) {
 
-                        // delete_examity_course
-                        $examity_course = helper::delete_examity_course($url, $moodle_course, $headers);
+                        $examity_course_id = $examity_course['course_id']);
+                        $examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
+                        $delete = helper::delete($examity_course_id, 'examity_course');
+
+                        // TODO: loop through all exams associated to this course and delete them
+
                     }
 
                     //
-                    // ask examity to get exam based on moodle_exam. TODO: create moodle_exam
+                    // delete exam 
                     //
-                    $examity_exam = helper::get_examity_exam($url, $moodle_exam, $moodle_course, $headers) ?? null;
+                    $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers) ?? null;
 
-                    if($examity_exam != null) {
+                    if(isset($examity_exam['exam_id'])) {
 
-                        // update the exam
-                        $examity_exam = helper::delete_examity_exam($url, $moodle_exam, $headers);
+                        $examity_exam_id = $examity_exam['exam_id']);
+                        $examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
+                        $delete = helper::delete($examity_exam_id, 'examity_exam');
+
                     }
 
                 break;
