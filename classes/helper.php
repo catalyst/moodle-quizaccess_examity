@@ -243,10 +243,10 @@ class helper {
      * @param array $headers set token in header.
      * @return string $examity_course - json of course data.
      */
-    public static function get_examity_course($url, $moodle_course_id, $headers) {
+    public static function get_examity_course($url, $examity_course, $headers) {
 
         $postdata = "";
-        $examity_course_id = (int)$moodle_course_id->examity_course_id ?? null;
+        $examity_course_id = (int)$examity_course->examity_course_id ?? null;
         $url = $url->value . '/courses' . '/' . $examity_course_id;
         $examity_course = self::post_api($url, 'read', $postdata, $headers) ?? null;
 
@@ -342,10 +342,8 @@ class helper {
             }";
 
             $examity_course = self::post_api($url, 'create', $postdata, $headers) ?? null;
-
             $examity_course = json_decode($examity_course, true);
     
-            $examity_user_id = $examity_course['course_id'] ?? null;
         }
 
         return $examity_course;
@@ -393,27 +391,49 @@ class helper {
         $duration = null;
 
         $postdata = "{
-                        \"course_id\":$course_id,
+                        \"course_id\":1536,
                         \"duration\":25,
-                        \"exam_end_date\":\"$exam_end_date\",
+                        \"exam_end_date\":\"2021-05-24T21:39:48.586Z\",
                         \"exam_instructions\":[
                         ],
-                        \"exam_level_id\":$exam_level_id,
-                        \"exam_name\":\"$exam_name\",
-                        \"exam_start_date\":\"$exam_start_date\",
-                        \"exam_url\":\"$exam_url\",
-                        \"status_id\":$status_id,
-                        \"allowed_attempts\":$allowed_attempts,
-                        \"exam_code\":\"$exam_code\",
-                        \"exam_password\":\"$exam_password\",
-                        \"exam_username\":\"$exam_username\",
-                        \"is_student_upload_file\":$is_student_upload_file,
+                        \"exam_level_id\":2,
+                        \"exam_name\":\"test_examity\",
+                        \"exam_start_date\":\"2021-05-24T21:39:48.586Z\",
+                        \"exam_url\":\"https://test.examity.com/onlineexam\",
+                        \"status_id\":1,
+                        \"allowed_attempts\":0,
+                        \"exam_code\":\"2324\",
+                        \"exam_password\":\"password\",
+                        \"exam_username\":\"username\",
+                        \"is_student_upload_file\":true,
                         \"metadata\": null,
                         \"unique_exam_urls\":[
                         ]
                     }";
 
+        // $postdata = "{
+        //                 \"course_id\":$course_id,
+        //                 \"duration\":25,
+        //                 \"exam_end_date\":\"$exam_end_date\",
+        //                 \"exam_instructions\":[
+        //                 ],
+        //                 \"exam_level_id\":$exam_level_id,
+        //                 \"exam_name\":\"$exam_name\",
+        //                 \"exam_start_date\":\"$exam_start_date\",
+        //                 \"exam_url\":\"$exam_url\",
+        //                 \"status_id\":$status_id,
+        //                 \"allowed_attempts\":$allowed_attempts,
+        //                 \"exam_code\":\"$exam_code\",
+        //                 \"exam_password\":\"$exam_password\",
+        //                 \"exam_username\":\"$exam_username\",
+        //                 \"is_student_upload_file\":$is_student_upload_file,
+        //                 \"metadata\": null,
+        //                 \"unique_exam_urls\":[
+        //                 ]
+        //             }";
+
         $examity_exam = self::post_api($url, 'create', $postdata, $headers);
+        $examity_exam = json_decode($examity_exam, true);
 
         return $examity_exam;
     }

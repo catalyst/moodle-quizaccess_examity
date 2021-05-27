@@ -93,8 +93,9 @@ class quizaccess_examity_observer {
         // var_dump($examity_user);die;
 
         // get_examity_course
-        // $examity_course = helper::get_examity_course($url, $moodle_course_id, $headers);
+        $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
 
+        // var_dump($examity_course);die;
         // // get_examity_exam
         // $examity_exam = helper::get_examity_exam($url, $moodle_exam_id, $headers);
         // var_dump($examity_exam);die;
@@ -136,7 +137,7 @@ class quizaccess_examity_observer {
                     $course = false;
                     $exam = false;
                 
-                    // // If examity user doesn't exist create and update custom database
+                    // If examity user doesn't exist create and update custom database
                     if(!$examity_user_id) {
 
                         $examity_user_id = helper::create_examity_user($url, $USER, $headers) ?? null;
@@ -160,6 +161,7 @@ class quizaccess_examity_observer {
                     } else {
                         $user = true;
                     }
+                    
                     //
                     // ask examity to get a course based on moodle_course else create one
                     //
@@ -186,27 +188,31 @@ class quizaccess_examity_observer {
                         $course = true;
                     }
 
-                    // if(!$examity_exam_id) {
+                    //
+                    // ask examity to get a exam based on moodle_exam else create one
+                    //
+                    if(!$examity_exam_id) {
 
-                    //     $examity_exam_id = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
 
-                    //     if($examity_exam_id != null){
+                        $examity_exam_id = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
 
-                    //         $data = [
-                    //             'id' => null,
-                    //             'moodle_exam_id' => $moodle_exam_id,
-                    //             'examity_exam_id' => $examity_exam_id
-                    //         ];
+                        if(isset($examity_exam_id['exam_id'])){
+
+                            $data = [
+                                'id' => null,
+                                'moodle_exam_id' => $moodle_exam_id,
+                                'examity_exam_id' => $examity_exam_id['exam_id']
+                            ];
     
-                    //         $insert = helper::insert($data, 'examity_exam');
-                    //         if($insert == false){
-                    //             return null;
-                    //         }
-                    //         $exam = true;
-                    //     }
-                    // } else {
-                    //     $exam = true;
-                    // }
+                            $insert = helper::insert($data, 'examity_exam');
+                            if($insert == false){
+                                return null;
+                            }
+                            $exam = true;
+                        }
+                    } else {
+                        $exam = true;
+                    }
 
                     // If all of these have values in the custom one to one tables then update the one to many
                     // if($user && $course && $exam) {
