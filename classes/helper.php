@@ -380,7 +380,7 @@ class helper {
         $exam_url         = 'https://test.examity.com/onlineexam';
         $status_id        = 1;
         $allowed_attempts = 0;
-        $exam_code        = 'string';
+        $exam_code        = $moodle_exam;
         $exam_password    = 'password';
         $exam_username    = 'username';
         $is_student_upload_file = true;
@@ -402,7 +402,7 @@ class helper {
                         \"exam_url\":\"https://test.examity.com/onlineexam\",
                         \"status_id\":1,
                         \"allowed_attempts\":0,
-                        \"exam_code\":\"2324\",
+                        \"exam_code\":\"$exam_code\",
                         \"exam_password\":\"password\",
                         \"exam_username\":\"username\",
                         \"is_student_upload_file\":true,
