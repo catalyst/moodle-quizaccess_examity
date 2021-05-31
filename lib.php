@@ -67,20 +67,20 @@ function quizaccess_examity_coursemodule_edit_post_actions($data, $course) {
 
     global $DB;
 
-    foreach($data as $key => $value) {
+    // foreach($data as $key => $value) {
 
-        if($key == 'type' && $value == "0") {
+    //     if($key == 'type' && $value == "0") {
 
-            $newelement = new stdClass();
-            $newelement->id = $data->id;
-            $newelement->cm = $data->coursemodule;
-            $newelement->name = $key;
-            $newelement->value = $value;
+    //         $newelement = new stdClass();
+    //         $newelement->id = $data->id;
+    //         $newelement->cm = $data->coursemodule;
+    //         $newelement->name = $key;
+    //         $newelement->value = $value;
 
-            $DB->insert_record('quizaccess_examity_config', $newelement);
+    //         $DB->insert_record('quizaccess_examity', $newelement);
 
-        }
-    }
+    //     }
+    // }
 }
 
 /**

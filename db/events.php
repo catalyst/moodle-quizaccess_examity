@@ -34,6 +34,9 @@ $observers = array (
         'eventname' => '\core\event\course_module_created',
         'callback'  => 'quizaccess_examity_observer::update'
     ),
+
+    // course_content_deleted, course_deleted, course_module_deleted, webservice_service_deleted, record_deleted
+
 );
 
 

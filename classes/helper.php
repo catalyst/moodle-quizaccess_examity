@@ -284,12 +284,12 @@ class helper {
 
         $firstname      = $USER->firstname;
         $lastname       = $USER->lastname;
-        $email          = 'blah9@gmail.com';//$USER->email;
+        $email          = 'blah16@gmail.com';//$USER->email;
         $picture        = $USER->picture;
         $phone2         = $USER->phone2;
         $country        = $USER->country;
         $timezone       = $USER->timezone;
-        $username       = 'blah9';//$USER->username;
+        $username       = 'blah16';//$USER->username;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
@@ -322,11 +322,11 @@ class helper {
      * @param array $headers set token in header.
      * @return string $examity_course
      */
-    public static function create_examity_course($url, $examity_user, $COURSE, $headers) {
+    public static function create_examity_course($url, $examity_user_id, $COURSE, $headers) {
 
-        $examity_course_id = null;
         $url = $url->value . '/courses';
-        $primary_instructor_id = (int)$examity_user->examity_user_id ?? null;
+        $examity_course_id = null;
+        $primary_instructor_id = (int)$examity_user_id;
 
         if($primary_instructor_id){
             $postdata = "{
@@ -340,10 +340,8 @@ class helper {
 
             $examity_course = self::post_api($url, 'create', $postdata, $headers) ?? null;
             $examity_course = json_decode($examity_course, true);
-    
+            $examity_course_id = (int)$examity_course['course_id'] ?? null;
         }
-
-        $examity_course_id = $examity_course['course_id'] ?? null;
 
         return $examity_course_id;
     }
@@ -374,7 +372,7 @@ class helper {
         $for_proctor      = true;
         $display_order    = 0;
         $exam_level_id    = 2;
-        $exam_name        = 'test_examity';
+        $exam_name        = 'old_course_new_exam1';
         $exam_start_date  = '2021-05-24T21:39:48.586Z';
         $exam_url         = 'https://test.examity.com/onlineexam';
         $status_id        = 1;
@@ -396,7 +394,7 @@ class helper {
                         \"exam_instructions\":[
                         ],
                         \"exam_level_id\":2,
-                        \"exam_name\":\"test_examity\",
+                        \"exam_name\":\"$exam_name\",
                         \"exam_start_date\":\"2021-05-24T21:39:48.586Z\",
                         \"exam_url\":\"https://test.examity.com/onlineexam\",
                         \"status_id\":1,
@@ -433,8 +431,9 @@ class helper {
 
         $examity_exam = self::post_api($url, 'create', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
+        $examity_exam_id = (int)$examity_exam['exam_id'];
 
-        return $examity_exam;
+        return $examity_exam_id;
     }
 
     // /**
