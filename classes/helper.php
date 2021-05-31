@@ -638,15 +638,24 @@ class helper {
      * @param array $headers set token in header.
      * @return object
      */
-    public static function delete_examity_exam($url, $moodle_exam_id, $headers) {
+    public static function delete_examity_exam($url, $examity_exam_id, $headers) {
 
-        $examity_exam = null; 
         $postdata = "";
-        $examity_exam_id = 6202;//$moodle_exam->id;
         $url = $url->value . '/exams' . '/' . $examity_exam_id;
         $examity_exam = self::post_api($url, 'delete', $postdata, $headers);
-        
+        $examity_exam = json_decode($examity_exam, true);
         return $examity_exam;
+    }
+
+    public static function select($table, $column, $value) {
+
+        
+        global $DB;
+        $values = null;
+        $sql = "$column = $value";
+        $values = $DB->get_records_select($table, $sql);
+
+        return $values;
     }
 
     public static function insert($data, $db_table) {
@@ -677,17 +686,11 @@ class helper {
         return $id;
     } 
 
-    public static function delete($data, $db_table) {
+    public static function delete($table, $column, $value) {
 
         global $DB;
         $id = null;
-
-        $data_object = new stdClass();
-        foreach($data as $key => $value) {
-            $data_object->$key = optional_param($key, $value, PARAM_INT);
-        }
-
-        $id = $DB->delete_record($db_table, $data_object, $returnid=true);
+        $id = $DB->delete_records_select($table, "$column = $value");
         return $id;
     } 
 
