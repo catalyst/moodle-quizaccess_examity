@@ -51,11 +51,8 @@ class quizaccess_examity_observer {
         $moodle_course_id = (int)$COURSE->id ?? null;
         $moodle_exam_id = $event->other['instanceid'] ?? null;
 
-        // var_dump('gets to here??????????????????????????????????????????');
-        // var_dump($event);
-        // var_dump('gets to here??????????????????????????????????????????');die;
 
-
+        // var_dump($moodle_course_id);die;
         //
         // Grab essential DB details 
         // 
@@ -65,7 +62,6 @@ class quizaccess_examity_observer {
         $client_password        = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_password'], 'value');
         $client_id              = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_id'], 'value');
         $url                    = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_url'], 'value');
-
 
         // Check whether the user, course or exam is already existing in the db
         $examity_user_id        = $DB->get_record('examity_user', ['moodle_user_id' => $moodle_user_id]);
@@ -100,8 +96,10 @@ class quizaccess_examity_observer {
 
         // $examity_course = helper::create_examity_course($url, $moodle_user_id, $COURSE, $headers);
 
-        // // create_examity_exam
-        // $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
+        // create_examity_exam
+
+        // $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $event, $headers);
+        // var_dump($examity_exam);die;
 
         // // update_examity_user
         // $examity_user = helper::update_examity_user($url, $moodle_user_id, $headers);
@@ -269,15 +267,14 @@ class quizaccess_examity_observer {
                     // if examity finds a course, it updates it's $COURSE data inside examity
                     //
                     if($examity_course_id) {
-                        $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers) ?? null;
+                        $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers);
                     }
-
                     
                     // ask examity to get a course infered from the moodle_course_id
                     // if examity finds a course, it updates it's $COURSE data inside examity
                     //
                     if($examity_exam_id) {
-                        $examity_exam_id = helper::update_examity_exam($url, $examity_user_id, $examity_course_id, $examity_exam_id, $headers) ?? null;
+                        $examity_exam_id = helper::update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers);
                     } 
 
                 break;
