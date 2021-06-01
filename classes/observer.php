@@ -139,10 +139,11 @@ class quizaccess_examity_observer {
                     // If examity user doesn't exist create and update custom database
                     if(!$examity_user_id) {
 
-                        $examity_user_id = helper::create_examity_user($url, $USER, $headers);
+                        $examity_user = helper::create_examity_user($url, $USER, $headers);
 
-                        if(isset($examity_user_id)){
+                        if(isset($examity_user['user_id'])){
 
+                            $examity_user_id = $examity_user['user_id'];
 
                             $data = [
                                 'id' => null,
@@ -167,9 +168,11 @@ class quizaccess_examity_observer {
                     //
                     if(!$examity_course_id) {
 
-                        $examity_course_id = helper::create_examity_course($url, $examity_user_id, $COURSE, $headers);
+                        $examity_course = helper::create_examity_course($url, $examity_user_id, $COURSE, $headers);
 
-                        if(isset($examity_course_id)){
+                        if(isset($examity_course['course_id'])){
+
+                            $examity_course_id = $examity_course['course_id'];
 
                             $data = [
                                 'id' => null,
@@ -177,7 +180,6 @@ class quizaccess_examity_observer {
                                 'examity_course_id' => $examity_course_id
                             ];
 
-    
                             $insert = helper::insert($data, 'examity_course');
                             if($insert == false){
                                 return null;
@@ -193,10 +195,12 @@ class quizaccess_examity_observer {
                     //
                     if(!$examity_exam_id) {
 
-                        $examity_exam_id = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
+                        $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
 
                         // we've created a new exam in examity
-                        if(isset($examity_exam_id)){
+                        if(isset($examity_exam['exam_id'])){
+
+                            $examity_exam_id = $examity_exam['exam_id'];
 
                             $data = [
                                 'id' => null,
@@ -259,14 +263,6 @@ class quizaccess_examity_observer {
             case '\core\event\course_module_updated': // Triggers when course is updated
 
                     //
-                    // ask examity to get a user inferred from the moodle_user_id
-                    // if examity finds a user, it updates it's $USER data inside examity
-                    //
-                    // if($examity_user_id) {
-                    //     $examity_user_id = helper::update_examity_user($url, $USER, $headers) ?? null;
-                    // }
-                    
-                    //
                     // ask examity to get a course infered from the moodle_course_id
                     // if examity finds a course, it updates it's $COURSE data inside examity
                     //
@@ -314,19 +310,12 @@ class quizaccess_examity_observer {
 
                     // $delete_examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
 
-                    //
-                    // delete exam 
-                    // 
-                    // examity_exam
-                    // examity_user_exam
-                    // examity_course_exam
-
-
-
                     if($examity_exam_id){
                         $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
 
                         if(isset($examity_exam['exam_id'])){
+
+                            $examity_exam_id = $examity_exam['exam_id'];
                             helper::delete_examity_exam($url, $examity_exam_id, $headers);
                             helper::delete('examity_exam', 'examity_exam_id', $examity_exam_id);
                             helper::delete('examity_user_exam', 'examity_exam_id', $examity_exam_id);
