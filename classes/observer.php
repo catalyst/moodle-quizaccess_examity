@@ -51,6 +51,11 @@ class quizaccess_examity_observer {
         $moodle_course_id = (int)$COURSE->id ?? null;
         $moodle_exam_id = $event->other['instanceid'] ?? null;
 
+        // var_dump('gets to here??????????????????????????????????????????');
+        // var_dump($event);
+        // var_dump('gets to here??????????????????????????????????????????');die;
+
+
         //
         // Grab essential DB details 
         // 
@@ -316,14 +321,17 @@ class quizaccess_examity_observer {
                     // examity_user_exam
                     // examity_course_exam
 
-                    $examity_exam_id = 6313;
-                    $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
 
-                    if(isset($examity_exam['exam_id'])){
-                        helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                        helper::delete('examity_exam', 'examity_exam_id', $examity_exam_id);
-                        helper::delete('examity_user_exam', 'examity_exam_id', $examity_exam_id);
-                        helper::delete('examity_course_exam', 'examity_exam_id', $examity_exam_id);
+
+                    if($examity_exam_id){
+                        $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
+
+                        if(isset($examity_exam['exam_id'])){
+                            helper::delete_examity_exam($url, $examity_exam_id, $headers);
+                            helper::delete('examity_exam', 'examity_exam_id', $examity_exam_id);
+                            helper::delete('examity_user_exam', 'examity_exam_id', $examity_exam_id);
+                            helper::delete('examity_course_exam', 'examity_exam_id', $examity_exam_id);
+                        }
                     }
 
                 break;
