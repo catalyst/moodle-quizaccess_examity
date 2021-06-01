@@ -156,10 +156,7 @@ class quizaccess_examity_observer {
                                 return null;
                             }
 
-                            $user = true;
-                        }
-                    } else {
-                        $user = true;
+                        } 
                     }
                     
                     //
@@ -183,10 +180,7 @@ class quizaccess_examity_observer {
                             if($insert == false){
                                 return null;
                             }
-                            $course = true;
                         }
-                    } else {
-                        $course = true;
                     }
 
                     //
@@ -211,14 +205,11 @@ class quizaccess_examity_observer {
                             if($insert == false){
                                 return null;
                             }
-                            $exam = true;
                         }
-                    } else {
-                        $exam = true;
                     }
 
                     // If all of these have values in the custom one to one tables then update the one to many
-                    if($user && $course && $exam) {
+                    if($examity_user_id && $examity_course_id && $examity_exam_id) {
                     
                         // examity_user_course
                         $data = [
