@@ -52,7 +52,7 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
 
         $attributes = array(0 => 'Enable', 1 => 'Disable');
         $mform->addElement('header', 'examity', 'Examity');
-        $mform->addElement('select', 'type', get_string('select_field', 'quizaccess_examity'), $attributes);
+        $mform->addElement('select', 'examity_enable_disable', get_string('select_field', 'quizaccess_examity'), $attributes);
         $mform->setDefault('type', 1);
     }
 }
@@ -92,12 +92,49 @@ function quizaccess_examity_coursemodule_edit_post_actions($data, $course) {
 function quizaccess_examity_coursemodule_validation($data, $files) {
 
     $errors = array();
-    // Check the quiz and make sure the password is not empty
-    // foreach($files as $key => $value) {
+    global $DB;
 
-    //     if($key == 'quizpassword' && $value == ""){
-    //         $errors['password'] = 'Requires password to be set';
-    //         return $errors;
-    //     }
-    // }
+    //TODO: get examity_enable_disable value and make it conditional
+
+    $examity_enabled = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_manage'], 'value');
+
+    if(isset($examity_enabled->value) && $examity_enabled->value == "1"){
+
+        // Check the quiz and make sure the password is not empty
+        foreach($files as $key => $value) {
+
+            //
+            // examity needs password
+            // 
+            if($key == 'quizpassword' && $value == ""){
+                $errors['password'] = 'Requires password to be set';
+                return $errors;
+            }
+
+            //
+            // examity needs timeopen
+            // 
+            if($key == 'timeopen' && $value == "0"){
+                $errors['timeopen'] = 'Exam open must be greater than zero';
+                return $errors;
+            }
+
+            //
+            // examity needs timeclosed
+            // 
+            if($key == 'timeclosed' && $value == "0"){
+                $errors['timeopen'] = 'Exam closed must be greater than zero';
+                return $errors;
+            }
+
+            //
+            // examity needs exam duration
+            // 
+            if($key == 'timelimit' && $value == "0"){
+                $errors['timeopen'] = 'Duration must be greater than zero';
+                return $errors;
+            }
+
+        }
+    }
 }

@@ -51,7 +51,6 @@ class quizaccess_examity_observer {
         $moodle_course_id = (int)$event->get_data()['courseid'] ?? null;
         $moodle_exam_id = (int)$event->get_data()['other']['instanceid'] ?? null;
 
-        // var_dump($moodle_course_id);die;
         //
         // Grab essential DB details 
         // 
@@ -83,51 +82,7 @@ class quizaccess_examity_observer {
         // 
         $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password);        
         $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
-
-        // $examity_user = helper::get_examity_user($url, $examity_user_id, $headers);
-        // $examity_user = $examity_user['user_id']);
-
-        // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
-        // $examity_user = $examity_course['course_id']);
-
-        
-        // $examity_user = helper::create_examity_user($url, $USER, $headers);
-
-        // $examity_course = helper::create_examity_course($url, $moodle_user_id, $COURSE, $headers);
-
-        // create_examity_exam
-
-        // $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $event, $headers);
-        // var_dump($examity_exam);die;
-
-        // // update_examity_user
-        // $examity_user = helper::update_examity_user($url, $moodle_user_id, $headers);
-
-        // // update_examity_course
-        // $examity_course = helper::update_examity_course($url, $moodle_user_id, $moodle_course_id, $headers);
-
-        // // update_examity_exam
-        // $examity_exam = helper::update_examity_exam($url, $moodle_course_id, $moodle_exam_id, $headers);
-
-        // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers) ?? null;
-
-
-        // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
-        // $examity_course_id = $examity_course['course_id'];
-
-        // $examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
-
-        // // delete_examity_user
-        // $examity_user = helper::delete_examity_user($url, $moodle_user_id, $headers);
-
-        // delete_examity_course
-        // $examity_course = helper::delete_examity_course($url, $moodle_course_id, $headers);
-
-        // // delete_examity_exam
-        // $examity_exam = helper::delete_examity_exam($url, $moodle_exam_id, $headers);
-
-        
-        
+  
         switch ($event->eventname) {
             case '\core\event\course_module_created': // Triggers when quiz is selected as a course activity
 
