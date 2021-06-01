@@ -66,8 +66,10 @@ class quizaccess_examity_observer {
         $client_id              = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_id'], 'value');
         $url                    = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_url'], 'value');
 
+
         // Check whether the user, course or exam is already existing in the db
         $examity_user_id        = $DB->get_record('examity_user', ['moodle_user_id' => $moodle_user_id]);
+
         if(isset($examity_user_id->examity_user_id)){
             $examity_user_id = (int)$examity_user_id->examity_user_id;
 

@@ -229,7 +229,7 @@ class helper {
         $examity_user = null;
         $examity_user_id = (int)$examity_user_id ?? null;
         $examity_user = self::post_api($url->value . '/users' . '/' . $examity_user_id, 'read', null, $headers);
-        $examity_user = json_decode($primary_instructor_id, true);
+        $examity_user = json_decode($examity_user_id, true);
 
         return $examity_user;
     }
@@ -248,7 +248,7 @@ class helper {
         $examity_course = null;
         $examity_course_id = (int)$examity_course_id ?? null;
         $url = $url->value . '/courses' . '/' . $examity_course_id;
-        $examity_course = self::post_api($url, 'read', $postdata, $headers) ?? null;
+        $examity_course = self::post_api($url, 'read', $postdata, $headers);
         $examity_course = json_decode($examity_course, true);
 
         return $examity_course;
@@ -267,7 +267,7 @@ class helper {
         $postdata = "";
         $examity_exam = null;
         $url = $url->value . '/exams' . '/' . $examity_exam_id;
-        $examity_exam = self::post_api($url, 'read', $postdata, $headers) ?? null;
+        $examity_exam = self::post_api($url, 'read', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
 
         return $examity_exam;
@@ -290,12 +290,12 @@ class helper {
 
         $firstname      = $USER->firstname;
         $lastname       = $USER->lastname;
-        $email          = 'blah16@gmail.com';//$USER->email;
+        $email          = 'blah17@gmail.com';//$USER->email;
         $picture        = $USER->picture;
         $phone2         = $USER->phone2;
         $country        = $USER->country;
         $timezone       = $USER->timezone;
-        $username       = 'blah16';//$USER->username;
+        $username       = 'blah17';//$USER->username;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
@@ -311,7 +311,7 @@ class helper {
                         \"send_password_reset_email\":true
         }";
 
-        $examity_user = self::post_api($url, 'create', $postdata, $headers) ?? null;
+        $examity_user = self::post_api($url, 'create', $postdata, $headers);
         $examity_user = json_decode($examity_user, true);
 
         return $examity_user;
@@ -342,8 +342,9 @@ class helper {
                 \"metadata\":{}
             }";
 
-            $examity_course = self::post_api($url, 'create', $postdata, $headers) ?? null;
+            $examity_course = self::post_api($url, 'create', $postdata, $headers);
             $examity_course = json_decode($examity_course, true);
+
         }
 
         return $examity_course;
