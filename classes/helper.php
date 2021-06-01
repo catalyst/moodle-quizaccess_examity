@@ -355,12 +355,12 @@ class helper {
      *
      * @param object $url - url for the curl request.
      * @param object $moodle_user - moodle user.
-     * @param object $moodle_course - moodle course.
+     * @param object $examity_course_id - moodle course.
      * @param object $moodle_exam - moodle exam.
      * @param array $headers set token in header. 
      * @return string $examity_exam
      */
-    public static function create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers) {
+    public static function create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $headers) {
 
         global $USER;
         global $COURSE;
@@ -372,7 +372,7 @@ class helper {
 
             $examity_exam = null;
             $url = $url->value . '/exams';
-            $course_id        = (int)$quiz_record->course;
+            $course_id        = (int)1536;
             $duration         = $quiz_record->timelimit;
             $exam_end_date    = $quiz_record->timeclose; 
             $rule_id          = 0;

@@ -194,7 +194,7 @@ class quizaccess_examity_observer {
                     //
                     if(!$examity_exam_id) {
 
-                        $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $headers);
+                        $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $headers);
 
                         // we've created a new exam in examity
                         if(isset($examity_exam['exam_id'])){
