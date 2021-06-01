@@ -47,10 +47,9 @@ class quizaccess_examity_observer {
         $examity_user_id = null;
         $examity_course_id = null;
         $examity_exam_id = null;
-        $moodle_user_id = (int)$event->userid ?? null;
-        $moodle_course_id = (int)$COURSE->id ?? null;
-        $moodle_exam_id = $event->other['instanceid'] ?? null;
-
+        $moodle_user_id = (int)$event->get_data()['userid'] ?? null;
+        $moodle_course_id = (int)$event->get_data()['courseid'] ?? null;
+        $moodle_exam_id = (int)$event->get_data()['other']['instanceid'] ?? null;
 
         // var_dump($moodle_course_id);die;
         //
@@ -308,7 +307,7 @@ class quizaccess_examity_observer {
                     // $delete_examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
 
                     // $delete_examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
-
+                    
                     if($examity_exam_id){
                         $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
 
