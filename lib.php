@@ -123,7 +123,7 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
             // examity needs timeclosed
             // 
             if($key == 'timeclosed' && $value == "0"){
-                $errors['timeopen'] = 'Exam closed must be greater than zero';
+                $errors['timeclosed'] = 'Exam closed must be greater than zero';
                 return $errors;
             }
 
@@ -131,7 +131,7 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
             // examity needs exam duration
             // 
             if($key == 'timelimit' && $value == "0"){
-                $errors['timeopen'] = 'Duration must be greater than zero';
+                $errors['timelimit'] = 'Duration must be greater than zero';
                 return $errors;
             }
 

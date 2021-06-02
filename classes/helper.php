@@ -212,6 +212,12 @@ class helper {
         $token = self::post_api($url->value .'/auth', 'create', $validation_data);
         $examity_token = json_decode($token, true);
 
+        if(!isset($examity_token['access_token'])){
+            $message = 'Examity could not authenticate your email and password, please check the your Examity configuration details';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
+        }
+
         return $examity_token;
     }
 
@@ -225,11 +231,16 @@ class helper {
      */
     public static function get_examity_user($url, $examity_user_id, $headers) {
 
-        // Check for existing instructor from Examity based on course creator ID eg. 107151
         $examity_user = null;
         $examity_user_id = (int)$examity_user_id ?? null;
         $examity_user = self::post_api($url->value . '/users' . '/' . $examity_user_id, 'read', null, $headers);
         $examity_user = json_decode($examity_user_id, true);
+
+        if(!isset($examity_user['user_id'])){
+            $message = 'Sorry, we could not find this user in Examity';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
+        }
 
         return $examity_user;
     }
@@ -244,12 +255,18 @@ class helper {
      */
     public static function get_examity_course($url, $examity_course_id, $headers) {
 
-        $postdata = "";
+        $postdata = null;
         $examity_course = null;
         $examity_course_id = (int)$examity_course_id ?? null;
         $url = $url->value . '/courses' . '/' . $examity_course_id;
         $examity_course = self::post_api($url, 'read', $postdata, $headers);
         $examity_course = json_decode($examity_course, true);
+
+        if(!isset($examity_course['course_id'])){
+            $message = 'Sorry, we could not find this course in Examity';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
+        }
 
         return $examity_course;
     }
@@ -264,11 +281,17 @@ class helper {
      */
     public static function get_examity_exam($url, $examity_exam_id, $headers) {
 
-        $postdata = "";
+        $postdata = null;
         $examity_exam = null;
         $url = $url->value . '/exams' . '/' . $examity_exam_id;
         $examity_exam = self::post_api($url, 'read', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
+
+        if(!isset($examity_exam['exam_id'])){
+            $message = 'Sorry, we could not find this exam in Examity';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
+        }
 
         return $examity_exam;
     }
@@ -314,6 +337,12 @@ class helper {
         $examity_user = self::post_api($url, 'create', $postdata, $headers);
         $examity_user = json_decode($examity_user, true);
 
+        if(!isset($examity_user['user_id'])){
+            $message = 'Sorry, we could not create this user in examity';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
+        }
+
         return $examity_user;
     }
 
@@ -329,6 +358,7 @@ class helper {
     public static function create_examity_course($url, $examity_user_id, $COURSE, $headers) {
 
         $examity_course = null;
+        $postdata = null;
         $url = $url->value . '/courses';
         $primary_instructor_id = (int)$examity_user_id;
 
@@ -345,6 +375,17 @@ class helper {
             $examity_course = self::post_api($url, 'create', $postdata, $headers);
             $examity_course = json_decode($examity_course, true);
 
+            if(!isset($examity_course['course_id'])){
+                $message = 'Sorry, we could not create this course in Examity';
+                $messagetype = 'error';
+                \core\notification::add($message, $messagetype);
+            }
+
+        } else {
+
+            $message = 'Could not find a suitable user to create this course in Examity';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
         }
 
         return $examity_course;
@@ -365,14 +406,15 @@ class helper {
         global $USER;
         global $COURSE;
         global $DB;
+        $postdata = null;
+        $examity_exam = null;
+        $url = $url->value . '/exams';
 
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
 
         if(isset($quiz_record->id)){
 
-            $examity_exam = null;
-            $url = $url->value . '/exams';
-            $course_id        = (int)1536;
+            $course_id        = (int)$examity_course_id;
             $duration         = $quiz_record->timelimit;
             $exam_end_date    = $quiz_record->timeclose; 
             $rule_id          = 0;
@@ -419,6 +461,12 @@ class helper {
 
         $examity_exam = self::post_api($url, 'create', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
+
+        if(!isset($examity_exam['exam_id'])){
+            $message = 'Sorry, we could not create this exam in Examity';
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
+        }
 
         return $examity_exam;
     }
@@ -484,12 +532,12 @@ class helper {
 
         global $DB;
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
+        $url = $url->value . '/exams' . '/' . (int)$examity_exam_id;
         $postdata = null;
 
         if(isset($quiz_record->id)){
 
             $examity_exam = null;
-            $url = $url->value . '/exams' . '/' . (int)$examity_exam_id;
             $course_id        = (int)$quiz_record->course;
             $duration         = $quiz_record->timelimit;
             $exam_end_date    = $quiz_record->timeclose; 

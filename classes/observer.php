@@ -80,197 +80,223 @@ class quizaccess_examity_observer {
         //
         // Connect to examity auth
         // 
-        $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password);        
-        $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
+        $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password, $moodle_course_id);   
+        
+        if(isset($examity_token["access_token"])) {
+
+            $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
   
-        switch ($event->eventname) {
-            case '\core\event\course_module_created': // Triggers when quiz is selected as a course activity
-
-                    $user = false;
-                    $course = false;
-                    $exam = false;
-                
-                    // If examity user doesn't exist create and update custom database
-                    if(!$examity_user_id) {
-
-                        $examity_user = helper::create_examity_user($url, $USER, $headers);
-
-                        if(isset($examity_user['user_id'])){
-
-                            $examity_user_id = $examity_user['user_id'];
-
+            switch ($event->eventname) {
+                case '\core\event\course_module_created': // Triggers when quiz is selected as a course activity
+                    
+                        // If examity user doesn't exist create and update custom database
+                        if(!$examity_user_id) {
+    
+                            $examity_user = helper::create_examity_user($url, $USER, $headers);
+    
+                            if(isset($examity_user['user_id'])){
+    
+                                $examity_user_id = $examity_user['user_id'];
+    
+                                $data = [
+                                    'id' => null,
+                                    'moodle_user_id' => $moodle_user_id,
+                                    'examity_user_id' => $examity_user_id
+                                ];
+        
+                                $insert = helper::insert($data, 'examity_user');
+    
+                                if($insert == false){
+                                    return null;
+                                }
+    
+                            } 
+                        }
+                        
+                        //
+                        // ask examity to get a course based on moodle_course else create one
+                        //
+                        if(!$examity_course_id) {
+    
+                            $examity_course = helper::create_examity_course($url, $examity_user_id, $COURSE, $headers);
+    
+                            if(isset($examity_course['course_id'])){
+    
+                                $examity_course_id = $examity_course['course_id'];
+    
+                                $data = [
+                                    'id' => null,
+                                    'moodle_course_id' => $moodle_course_id,
+                                    'examity_course_id' => $examity_course_id
+                                ];
+    
+                                $insert = helper::insert($data, 'examity_course');
+                                if($insert == false){
+                                    return null;
+                                }
+                            }
+                        }
+    
+                        //
+                        // ask examity to get a exam based on moodle_exam else create one
+                        //
+                        if(!$examity_exam_id) {
+    
+                            $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $headers);
+    
+                            // we've created a new exam in examity
+                            if(isset($examity_exam['exam_id'])){
+    
+                                $examity_exam_id = $examity_exam['exam_id'];
+    
+                                $data = [
+                                    'id' => null,
+                                    'moodle_exam_id' => $moodle_exam_id,
+                                    'examity_exam_id' => $examity_exam_id
+                                ];
+        
+                                $insert = helper::insert($data, 'examity_exam');
+                                if($insert == false){
+                                    return null;
+                                }
+                            }
+                        }
+    
+                        // If all of these have values in the custom one to one tables then update the one to many
+                        if($examity_user_id && $examity_course_id && $examity_exam_id) {
+                        
+                            // examity_user_course
                             $data = [
                                 'id' => null,
                                 'moodle_user_id' => $moodle_user_id,
-                                'examity_user_id' => $examity_user_id
+                                'moodle_course_id' => $moodle_course_id,
+                                'examity_user_id' => $examity_user_id,
+                                'examity_course_id' => $examity_course_id,
                             ];
     
-                            $insert = helper::insert($data, 'examity_user');
-
-                            if($insert == false){
-                                return null;
-                            }
-
-                        } 
-                    }
+                            $insert = helper::insert($data, 'examity_user_course');
+    
+                      
+                            // examity_user_exam
+                            $data = [
+                                'id' => null,
+                                'moodle_user_id' => $moodle_user_id,
+                                'moodle_exam_id' => $moodle_exam_id,
+                                'examity_user_id' => $examity_user_id,
+                                'examity_exam_id' => $examity_exam_id,
+                            ];
+    
+                            $insert = helper::insert($data, 'examity_user_exam');
+    
+                            // $examity_user   = helper::get_examity_user($url, $examity_user_id, $headers);
+                            // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
+                            // $examity_exam   = helper::get_examity_exam($url, $examity_exam_id, $headers);
                     
-                    //
-                    // ask examity to get a course based on moodle_course else create one
-                    //
-                    if(!$examity_course_id) {
-
-                        $examity_course = helper::create_examity_course($url, $examity_user_id, $COURSE, $headers);
-
-                        if(isset($examity_course['course_id'])){
-
-                            $examity_course_id = $examity_course['course_id'];
-
+                            // examity_course_exam
                             $data = [
                                 'id' => null,
                                 'moodle_course_id' => $moodle_course_id,
-                                'examity_course_id' => $examity_course_id
-                            ];
-
-                            $insert = helper::insert($data, 'examity_course');
-                            if($insert == false){
-                                return null;
-                            }
-                        }
-                    }
-
-                    //
-                    // ask examity to get a exam based on moodle_exam else create one
-                    //
-                    if(!$examity_exam_id) {
-
-                        $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $headers);
-
-                        // we've created a new exam in examity
-                        if(isset($examity_exam['exam_id'])){
-
-                            $examity_exam_id = $examity_exam['exam_id'];
-
-                            $data = [
-                                'id' => null,
                                 'moodle_exam_id' => $moodle_exam_id,
-                                'examity_exam_id' => $examity_exam_id
+                                'examity_course_id' => $examity_course_id,
+                                'examity_exam_id' => $examity_exam_id,
                             ];
     
-                            $insert = helper::insert($data, 'examity_exam');
-                            if($insert == false){
-                                return null;
+                            $insert = helper::insert($data, 'examity_course_exam');
+    
+                            // Send success message back to the page.
+                            $message = 'Success, an exam has been created in Examity.';
+                            $messagetype = 'success';
+                            \core\notification::add($message, $messagetype);
+    
+                        }
+    
+                    break;
+                case '\core\event\course_module_updated': // Triggers when course is updated
+    
+                        //
+                        // ask examity to get a course infered from the moodle_course_id
+                        // if examity finds a course, it updates it's $COURSE data inside examity
+                        //
+                        if($examity_course_id) {
+                            $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers);
+                        }
+                        
+                        // ask examity to get a course infered from the moodle_course_id
+                        // if examity finds a course, it updates it's $COURSE data inside examity
+                        //
+                        if($examity_exam_id) {
+                            $examity_exam_id = helper::update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers);
+                        }
+                        
+                        if($examity_course_id && $examity_exam_id) {
+                            $message = 'Success, your course and exam details have been updated in Examity';
+                            $messagetype = 'success';
+                            \core\notification::add($message, $messagetype);
+                        } else {
+                            $message = 'Sorry, your course and exam details could not be updated in Examity';
+                            $messagetype = 'error';
+                            \core\notification::add($message, $messagetype);
+                        }
+    
+                    break;
+                case '\core\event\course_module_deleted':
+    
+                        //
+                        // delete course
+                        //
+                        // $exams = helper::select('examity_course_exam', 'examity_course_id', $examity_course_id);
+                        // foreach($exams as $exam){
+    
+                        //     // Delete exams associated to a couse from examity
+                        //     $delete_examity_exam = helper::delete_examity_exam($url, $exam->examity_exam_id, $headers);
+    
+                        //     // Delete exams associated to a couse from moodle custom database 
+                        //     $delete_examity_exam = helper::delete('examity_exam', 'examity_exam_id', $exam->examity_exam_id);
+                        //     $delete_examity_user_exam = helper::delete('examity_user_exam', 'examity_exam_id', $exam->examity_exam_id);
+                        //     $delete_examity_course_exam = helper::delete('examity_course_exam', 'examity_exam_id', $exam->examity_exam_id);
+                        // }
+    
+                        // // Delete course record from examity after deleting the exams 
+                        // $delete_examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
+    
+                        // // Delete course record from moodle custom database 
+                        // $delete_examity_course = helper::delete('examity_course', 'examity_course_id', $examity_course_id);
+                        // $delete_examity_user_course = helper::delete('examity_user_course', 'examity_course_id', $examity_course_id);
+                        // $delete_examity_course_exam = helper::delete('examity_course_exam', 'examity_course_id', $examity_course_id);
+    
+    
+                        // // Delete course record from examity after deleting the exams 
+                        // $delete_examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
+    
+                        // $delete_examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
+                        
+                        if($examity_exam_id){
+                            $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
+    
+                            if(isset($examity_exam['exam_id'])){
+    
+                                $examity_exam_id = $examity_exam['exam_id'];
+                                helper::delete_examity_exam($url, $examity_exam_id, $headers);
+                                helper::delete('examity_exam', 'examity_exam_id', $examity_exam_id);
+                                helper::delete('examity_user_exam', 'examity_exam_id', $examity_exam_id);
+                                helper::delete('examity_course_exam', 'examity_exam_id', $examity_exam_id);
+    
+                                $message = 'Success, your exam has been deleted from Examity';
+                                $messagetype = 'success';
+                                \core\notification::add($message, $messagetype);
+                            } else {
+
+                                $message = 'Success, your exam has been deleted from Examity';
+                                $messagetype = 'success';
+                                \core\notification::add($message, $messagetype);
+
                             }
                         }
-                    }
-
-                    // If all of these have values in the custom one to one tables then update the one to many
-                    if($examity_user_id && $examity_course_id && $examity_exam_id) {
-                    
-                        // examity_user_course
-                        $data = [
-                            'id' => null,
-                            'moodle_user_id' => $moodle_user_id,
-                            'moodle_course_id' => $moodle_course_id,
-                            'examity_user_id' => $examity_user_id,
-                            'examity_course_id' => $examity_course_id,
-                        ];
-
-                        $insert = helper::insert($data, 'examity_user_course');
-
-                        // examity_user_exam
-                        $data = [
-                            'id' => null,
-                            'moodle_user_id' => $moodle_user_id,
-                            'moodle_exam_id' => $moodle_exam_id,
-                            'examity_user_id' => $examity_user_id,
-                            'examity_exam_id' => $examity_exam_id,
-                        ];
-
-                        $insert = helper::insert($data, 'examity_user_exam');
-
-                        $examity_user   = helper::get_examity_user($url, $examity_user_id, $headers);
-                        $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
-                        $examity_exam   = helper::get_examity_exam($url, $examity_exam_id, $headers);
-                
-                        // examity_course_exam
-                        $data = [
-                            'id' => null,
-                            'moodle_course_id' => $moodle_course_id,
-                            'moodle_exam_id' => $moodle_exam_id,
-                            'examity_course_id' => $examity_course_id,
-                            'examity_exam_id' => $examity_exam_id,
-                        ];
-
-                        $insert = helper::insert($data, 'examity_course_exam');
-                    }
-
-                break;
-            case '\core\event\course_module_updated': // Triggers when course is updated
-
-                    //
-                    // ask examity to get a course infered from the moodle_course_id
-                    // if examity finds a course, it updates it's $COURSE data inside examity
-                    //
-                    if($examity_course_id) {
-                        $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers);
-                    }
-                    
-                    // ask examity to get a course infered from the moodle_course_id
-                    // if examity finds a course, it updates it's $COURSE data inside examity
-                    //
-                    if($examity_exam_id) {
-                        $examity_exam_id = helper::update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers);
-                    } 
-
-                break;
-            case '\core\event\course_module_deleted':
-
-                    //
-                    // delete course
-                    //
-                    // $exams = helper::select('examity_course_exam', 'examity_course_id', $examity_course_id);
-                    // foreach($exams as $exam){
-
-                    //     // Delete exams associated to a couse from examity
-                    //     $delete_examity_exam = helper::delete_examity_exam($url, $exam->examity_exam_id, $headers);
-
-                    //     // Delete exams associated to a couse from moodle custom database 
-                    //     $delete_examity_exam = helper::delete('examity_exam', 'examity_exam_id', $exam->examity_exam_id);
-                    //     $delete_examity_user_exam = helper::delete('examity_user_exam', 'examity_exam_id', $exam->examity_exam_id);
-                    //     $delete_examity_course_exam = helper::delete('examity_course_exam', 'examity_exam_id', $exam->examity_exam_id);
-                    // }
-
-                    // // Delete course record from examity after deleting the exams 
-                    // $delete_examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
-
-                    // // Delete course record from moodle custom database 
-                    // $delete_examity_course = helper::delete('examity_course', 'examity_course_id', $examity_course_id);
-                    // $delete_examity_user_course = helper::delete('examity_user_course', 'examity_course_id', $examity_course_id);
-                    // $delete_examity_course_exam = helper::delete('examity_course_exam', 'examity_course_id', $examity_course_id);
-
-
-                    // // Delete course record from examity after deleting the exams 
-                    // $delete_examity_course = helper::delete_examity_course($url, $examity_course_id, $headers);
-
-                    // $delete_examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                    
-                    if($examity_exam_id){
-                        $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
-
-                        if(isset($examity_exam['exam_id'])){
-
-                            $examity_exam_id = $examity_exam['exam_id'];
-                            helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                            helper::delete('examity_exam', 'examity_exam_id', $examity_exam_id);
-                            helper::delete('examity_user_exam', 'examity_exam_id', $examity_exam_id);
-                            helper::delete('examity_course_exam', 'examity_exam_id', $examity_exam_id);
-                        }
-                    }
-
-                break;
-            default:
-                return;
+    
+                    break;
+                default:
+                    return;
+            }
         }
     }
-   
 }
