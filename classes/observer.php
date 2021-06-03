@@ -204,7 +204,7 @@ class quizaccess_examity_observer {
                             $insert = helper::insert($data, 'examity_course_exam');
     
                             // Send success message back to the page.
-                            $message = 'Success, an exam has been created in Examity.';
+                            $message = get_string('success_create_exam', 'quizaccess_examity');
                             $messagetype = 'success';
                             \core\notification::add($message, $messagetype);
     
@@ -212,13 +212,20 @@ class quizaccess_examity_observer {
     
                     break;
                 case '\core\event\course_module_updated': // Triggers when course is updated
-    
+
                         //
                         // ask examity to get a course infered from the moodle_course_id
                         // if examity finds a course, it updates it's $COURSE data inside examity
                         //
                         if($examity_course_id) {
                             $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers);
+                            $message = get_string('success_update_course', 'quizaccess_examity');
+                            $messagetype = 'success';
+                            \core\notification::add($message, $messagetype);
+                        } else {
+                            $message = get_string('error_update_course', 'quizaccess_examity');
+                            $messagetype = 'error';
+                            \core\notification::add($message, $messagetype);
                         }
                         
                         // ask examity to get a course infered from the moodle_course_id
@@ -226,18 +233,15 @@ class quizaccess_examity_observer {
                         //
                         if($examity_exam_id) {
                             $examity_exam_id = helper::update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers);
-                        }
-                        
-                        if($examity_course_id && $examity_exam_id) {
-                            $message = 'Success, your course and exam details have been updated in Examity';
+                            $message = get_string('success_update_exam', 'quizaccess_examity');
                             $messagetype = 'success';
                             \core\notification::add($message, $messagetype);
                         } else {
-                            $message = 'Sorry, your course and exam details could not be updated in Examity';
+                            $message = get_string('error_update_exam', 'quizaccess_examity');
                             $messagetype = 'error';
                             \core\notification::add($message, $messagetype);
                         }
-    
+                        
                     break;
                 case '\core\event\course_module_deleted':
     
@@ -271,23 +275,24 @@ class quizaccess_examity_observer {
                         // $delete_examity_exam = helper::delete_examity_exam($url, $examity_exam_id, $headers);
                         
                         if($examity_exam_id){
+                            
                             $examity_exam = helper::get_examity_exam($url, $examity_exam_id, $headers);
     
                             if(isset($examity_exam['exam_id'])){
-    
+
                                 $examity_exam_id = $examity_exam['exam_id'];
                                 helper::delete_examity_exam($url, $examity_exam_id, $headers);
                                 helper::delete('examity_exam', 'examity_exam_id', $examity_exam_id);
                                 helper::delete('examity_user_exam', 'examity_exam_id', $examity_exam_id);
                                 helper::delete('examity_course_exam', 'examity_exam_id', $examity_exam_id);
-    
-                                $message = 'Success, your exam has been deleted from Examity';
+                                $message = get_string('success_delete_exam', 'quizaccess_examity');
                                 $messagetype = 'success';
                                 \core\notification::add($message, $messagetype);
-                            } else {
 
-                                $message = 'Success, your exam has been deleted from Examity';
-                                $messagetype = 'success';
+                            } else {
+                                
+                                $message = get_string('error_delete_exam', 'quizaccess_examity');
+                                $messagetype = 'error';
                                 \core\notification::add($message, $messagetype);
 
                             }
@@ -297,6 +302,10 @@ class quizaccess_examity_observer {
                 default:
                     return;
             }
+        } else {
+            $message = get_string('error_auth', 'quizaccess_examity');
+            $messagetype = 'error';
+            \core\notification::add($message, $messagetype);
         }
     }
 }
