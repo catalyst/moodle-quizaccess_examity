@@ -51,9 +51,6 @@ class quizaccess_examity_observer {
         $moodle_course_id = (int)$event->get_data()['courseid'] ?? null;
         $moodle_exam_id = (int)$event->get_data()['other']['instanceid'] ?? null;
 
-        //
-        // Grab essential DB details 
-        // 
         $consumer_username      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_username'], 'value');
         $consumer_password      = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'consumer_password'], 'value');
         $client_username        = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'client_username'], 'value');
@@ -77,9 +74,7 @@ class quizaccess_examity_observer {
             $examity_exam_id = (int)$examity_exam_id->examity_exam_id;
         }
 
-        //
-        // Connect to examity auth
-        // 
+        // connect to examity auth
         $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password, $moodle_course_id);   
         
         if(isset($examity_token["access_token"])) {
@@ -87,9 +82,8 @@ class quizaccess_examity_observer {
             $headers['Authorization'] = ' Bearer '. $examity_token["access_token"];
   
             switch ($event->eventname) {
-                case '\core\event\course_module_created': // Triggers when quiz is selected as a course activity
+                case '\core\event\course_module_created': 
                     
-                        // If examity user doesn't exist create and update custom database
                         if(!$examity_user_id) {
     
                             $examity_user = helper::create_examity_user($url, $USER, $headers);
@@ -107,6 +101,9 @@ class quizaccess_examity_observer {
                                 $insert = helper::insert($data, 'examity_user');
     
                                 if($insert == false){
+                                    $message = get_string('error_create_exam', 'quizaccess_examity');
+                                    $messagetype = 'success';
+                                    \core\notification::add($message, $messagetype);
                                     return null;
                                 }
     
@@ -131,7 +128,11 @@ class quizaccess_examity_observer {
                                 ];
     
                                 $insert = helper::insert($data, 'examity_course');
+
                                 if($insert == false){
+                                    $message = get_string('error_create_exam', 'quizaccess_examity');
+                                    $messagetype = 'success';
+                                    \core\notification::add($message, $messagetype);
                                     return null;
                                 }
                             }
@@ -144,7 +145,6 @@ class quizaccess_examity_observer {
     
                             $examity_exam = helper::create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $headers);
     
-                            // we've created a new exam in examity
                             if(isset($examity_exam['exam_id'])){
     
                                 $examity_exam_id = $examity_exam['exam_id'];
@@ -157,12 +157,17 @@ class quizaccess_examity_observer {
         
                                 $insert = helper::insert($data, 'examity_exam');
                                 if($insert == false){
+                                    $message = get_string('error_create_exam', 'quizaccess_examity');
+                                    $messagetype = 'success';
+                                    \core\notification::add($message, $messagetype);
                                     return null;
                                 }
                             }
                         }
     
-                        // If all of these have values in the custom one to one tables then update the one to many
+                        //
+                        // update custom database examity tables in moodle
+                        //
                         if($examity_user_id && $examity_course_id && $examity_exam_id) {
                         
                             // examity_user_course
@@ -202,12 +207,9 @@ class quizaccess_examity_observer {
                             ];
     
                             $insert = helper::insert($data, 'examity_course_exam');
-    
-                            // Send success message back to the page.
                             $message = get_string('success_create_exam', 'quizaccess_examity');
                             $messagetype = 'success';
                             \core\notification::add($message, $messagetype);
-    
                         }
     
                     break;
@@ -306,6 +308,7 @@ class quizaccess_examity_observer {
             $message = get_string('error_auth', 'quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
+            return null;
         }
     }
 }
