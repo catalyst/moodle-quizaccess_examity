@@ -406,9 +406,12 @@ class helper {
         global $USER;
         global $COURSE;
         global $DB;
+        global $CFG;
         $postdata = null;
         $examity_exam = null;
         $url = $url->value . '/exams';
+
+        // var_dump('http://blah.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&examity=1');die;
 
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
 
@@ -425,7 +428,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = 'https://test.examity.com/onlineexam';
+            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&examity=1'; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
@@ -531,6 +534,7 @@ class helper {
     public static function update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers) {
 
         global $DB;
+        global $CFG;
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
         $url = $url->value . '/exams' . '/' . (int)$examity_exam_id;
         $postdata = null;
@@ -549,7 +553,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = 'https://test.examity.com/onlineexam';
+            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&examity=1'; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;

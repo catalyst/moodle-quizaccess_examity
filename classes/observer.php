@@ -102,14 +102,14 @@ class quizaccess_examity_observer {
     
                                 if($insert == false){
                                     $message = get_string('error_create_exam', 'quizaccess_examity');
-                                    $messagetype = 'success';
+                                    $messagetype = 'error';
                                     \core\notification::add($message, $messagetype);
                                     return null;
                                 }
     
                             } 
                         }
-                        
+
                         //
                         // ask examity to get a course based on moodle_course else create one
                         //
@@ -131,13 +131,13 @@ class quizaccess_examity_observer {
 
                                 if($insert == false){
                                     $message = get_string('error_create_exam', 'quizaccess_examity');
-                                    $messagetype = 'success';
+                                    $messagetype = 'error';
                                     \core\notification::add($message, $messagetype);
                                     return null;
                                 }
                             }
                         }
-    
+
                         //
                         // ask examity to get a exam based on moodle_exam else create one
                         //
@@ -158,7 +158,7 @@ class quizaccess_examity_observer {
                                 $insert = helper::insert($data, 'examity_exam');
                                 if($insert == false){
                                     $message = get_string('error_create_exam', 'quizaccess_examity');
-                                    $messagetype = 'success';
+                                    $messagetype = 'error';
                                     \core\notification::add($message, $messagetype);
                                     return null;
                                 }
