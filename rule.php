@@ -69,6 +69,16 @@ class quizaccess_examity extends quiz_access_rule_base {
      *      reason if access should be prevented.
      */
     public function prevent_access() {
-        return false;
+
+        global $PAGE;
+        $sso_url = false;
+
+        $url_params = $PAGE->url->params();
+
+        if(isset($url_params['usingexamity']) && $url_params['usingexamity'] == 1){
+            $sso_url = '<a href="http://localhost:8000/mod/lti/view.php?id=1170"><span>Click here to login into Examity</span></a>';
+        }
+
+        return $sso_url;
     }
 }
