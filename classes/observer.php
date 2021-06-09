@@ -26,6 +26,9 @@
 defined('MOODLE_INTERNAL') || die;
 
 use quizaccess_examity\helper;
+use moodle\mod\lti as lti;
+require_once($CFG->dirroot.'/mod/lti/lib.php');
+require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 class quizaccess_examity_observer {
 
@@ -72,8 +75,8 @@ class quizaccess_examity_observer {
         $examity_exam_id        = $DB->get_record('examity_exam', ['moodle_exam_id' => $moodle_exam_id]);
         if(isset($examity_exam_id->examity_exam_id)){
             $examity_exam_id = (int)$examity_exam_id->examity_exam_id;
-        }
-
+        }  
+        
         // connect to examity auth
         $examity_token = helper::get_examity_token($url, $client_id, $consumer_username, $consumer_password, $moodle_course_id);   
         
@@ -162,6 +165,7 @@ class quizaccess_examity_observer {
                                     \core\notification::add($message, $messagetype);
                                     return null;
                                 }
+
                             }
                         }
     

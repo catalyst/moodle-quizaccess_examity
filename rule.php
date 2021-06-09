@@ -73,12 +73,13 @@ class quizaccess_examity extends quiz_access_rule_base {
         global $PAGE;
         global $CFG;
 
+        $moodle_exam_id = (int)$PAGE->cm->id;
         $sso_url = false;
         $root_url = $CFG->wwwroot;
         $url_params = $PAGE->url->params();
 
-        if(isset($url_params['usingexamity']) && $url_params['useexamity'] == 1) {
-            $sso_url = '<a href="'. $root_url .'/mod/lti/view.php?id=1170"><span>Click here to login into Examity</span></a>';
+        if(isset($url_params['useexamity'])) {
+            $sso_url = '<a href="'. $root_url .'/mod/quiz/accessrule/examity/launch.php?moodle_exam_id='.$moodle_exam_id.'"><span>Click here to login into Examity</span></a>';
         }
 
         return $sso_url;

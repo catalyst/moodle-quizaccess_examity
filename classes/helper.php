@@ -410,9 +410,6 @@ class helper {
         $postdata = null;
         $examity_exam = null;
         $url = $url->value . '/exams';
-
-        // var_dump('http://blah.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&examity=1');die;
-
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
 
         if(isset($quiz_record->id)){
@@ -428,7 +425,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&examity=1'; // TODO: $CFG->wwwroot should be used here.
+            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1'; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
@@ -553,7 +550,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&examity=1'; // TODO: $CFG->wwwroot should be used here.
+            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1'; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
@@ -753,6 +750,40 @@ class helper {
         $id = $DB->delete_records_select($table, "$column = $value");
         return $id;
     } 
+
+    public static function examity_sso($moodle_course_id, $moodle_exam_id) {
+
+                // create a sso link for this quiz
+                $lti = new stdClass();
+                $lti->id = 3;
+                $lti->course = $moodle_course_id;
+                $lti->name = 'examity_sso';
+                $lti->intro = 'link for single sign on examity';
+                $lti->introformat = '1';
+                $lti->timecreated = '';
+                $lti->timemodified = '';
+                $lti->typeid = '1';
+                $lti->toolurl = '';
+                $lti->securetoolurl = '';
+                $lti->instructorchoicesendname = '1';
+                $lti->instructorchoicesendemailaddr = '1';
+                $lti->instructorchoiceallowroster = NULL;
+                $lti->instructorchoiceallowsetting = NULL;
+                $lti->instructorcustomparameters = "";
+                $lti->instructorchoiceacceptgrades = "1";
+                $lti->grade = "";
+                $lti->launchcontainer = "1";
+                $lti->resourcekey = "";
+                $lti->password = "";
+                $lti->debuglaunch = "0";
+                $lti->showtitlelaunch = "1";
+                $lti->servicesalt = "";
+                $lti->icon = "";
+                $lti->secureicon = "";
+                $lti->cmid = $moodle_exam_id;
+
+                return $lti;
+    }
 
 }
 
