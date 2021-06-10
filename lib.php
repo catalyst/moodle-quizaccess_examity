@@ -53,34 +53,8 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
         $attributes = array(0 => 'Enable', 1 => 'Disable');
         $mform->addElement('header', 'examity', 'Examity');
         $mform->addElement('select', 'examity_enable_disable', get_string('select_field', 'quizaccess_examity'), $attributes);
-        $mform->setDefault('type', 1);
+        $mform->setDefault('examity_enable_disable', 1);
     }
-}
-
-/**
- * Add a hook to "save" the Examity select to custom table.
- *
- * @param stdClass $data
- * @param stdClass $course
- */
-function quizaccess_examity_coursemodule_edit_post_actions($data, $course) {
-
-    global $DB;
-
-    // foreach($data as $key => $value) {
-
-    //     if($key == 'type' && $value == "0") {
-
-    //         $newelement = new stdClass();
-    //         $newelement->id = $data->id;
-    //         $newelement->cm = $data->coursemodule;
-    //         $newelement->name = $key;
-    //         $newelement->value = $value;
-
-    //         $DB->insert_record('quizaccess_examity', $newelement);
-
-    //     }
-    // }
 }
 
 /**
@@ -94,11 +68,9 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
     $errors = array();
     global $DB;
 
-    //TODO: get examity_enable_disable value and make it conditional
-
     $examity_enabled = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_manage'], 'value');
 
-    if(isset($examity_enabled->value) && $examity_enabled->value == "1"){
+    if($examity_enabled->value != false && $examity_enabled->value == "1" && $files['examity_enable_disable'] == "0") {
 
         // Check the quiz and make sure the password is not empty
         foreach($files as $key => $value) {
