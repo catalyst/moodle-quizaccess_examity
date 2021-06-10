@@ -86,7 +86,7 @@ class quizaccess_examity_observer {
   
             switch ($event->eventname) {
                 case '\core\event\course_module_created': 
-                    
+
                         if(!$examity_user_id) {
     
                             $examity_user = helper::create_examity_user($url, $USER, $headers);

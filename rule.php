@@ -48,6 +48,7 @@ class quizaccess_examity extends quiz_access_rule_base {
      * @return quiz_access_rule_base|null the rule, if applicable, else null.
      */
     public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
+
         return new self($quizobj, $timenow);
     }
 
@@ -72,16 +73,18 @@ class quizaccess_examity extends quiz_access_rule_base {
 
         global $PAGE;
         global $CFG;
+        global $DB;
 
-        $moodle_exam_id = (int)$PAGE->cm->id;
+        $moodle_exam_id = (int)$PAGE->cm->instance;
         $sso_url = false;
         $root_url = $CFG->wwwroot;
-        $url_params = $PAGE->url->params();
+        $examity_exam_id = $DB->get_record('examity_exam', ['moodle_exam_id' => $moodle_exam_id]);
 
-        if(isset($url_params['useexamity'])) {
+        if($examity_exam_id) {
             $sso_url = '<a href="'. $root_url .'/mod/quiz/accessrule/examity/launch.php?moodle_exam_id='.$moodle_exam_id.'"><span>Click here to login into Examity</span></a>';
         }
 
         return $sso_url;
     }
+
 }
