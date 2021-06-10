@@ -24,7 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 $plugin->component = 'quizaccess_examity';
 $plugin->release = '0.1.0';
 $plugin->version = 2021041945;

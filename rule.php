@@ -48,7 +48,6 @@ class quizaccess_examity extends quiz_access_rule_base {
      * @return quiz_access_rule_base|null the rule, if applicable, else null.
      */
     public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
-
         return new self($quizobj, $timenow);
     }
 

@@ -29,23 +29,19 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-
-// Get global class.
 require_once($CFG->dirroot.'/plagiarism/lib.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 
 /**
- * Add ability for the teacher to enable examity within a quiz.
- * Allows a plugin to inject elements into a coursemodule editing form. 
+ * add ability for the teacher to enable examity within a quiz.
+ * allows a plugin to inject elements into a coursemodule editing form. 
  *
- * @param stdClass $data
- * @param stdClass $course
+ * @param object $formwrapper
+ * @param object $mform
  */
-        
 function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform) {
     
     global $DB;
-
     $modulename = $formwrapper->get_current()->modulename;
 
     if ($modulename == 'quiz') {
@@ -58,10 +54,10 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
 }
 
 /**
- * Validate the data in the new field when the form is submitted
+ * validate the data in the new field when the form is submitted
  *
- * @param stdClass $data
- * @return array $errors
+ * @param object $data
+ * @return array $files
  */
 function quizaccess_examity_coursemodule_validation($data, $files) {
 
@@ -70,9 +66,9 @@ function quizaccess_examity_coursemodule_validation($data, $files) {
 
     $examity_enabled = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_manage'], 'value');
 
+    // only validate if examity is switched on and enabled.
     if($examity_enabled->value != false && $examity_enabled->value == "1" && $files['examity_enable_disable'] == "0") {
 
-        // Check the quiz and make sure the password is not empty
         foreach($files as $key => $value) {
 
             //

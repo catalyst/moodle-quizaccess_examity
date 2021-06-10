@@ -41,13 +41,10 @@ $string['client_username_help']   = "Enter client username";
 $string['client_password_help']   = "Enter client password";
 $string['client_id_help']         = "Enter client ID";
 $string['examity_url_help']       = "Enter examity url";
-
 $string['error_auth'] = 'Sorry Examity could not authenticate your username and password, check these details in the module configuration page.';
 $string['success_create_course'] = 'Success, a course has been created in Examity.';
-
 $string['success_create_exam'] = 'Success, an exam has been created inside of Examity.'; 
 $string['error_create_exam'] = 'Sorry, your exam could not be created in Examity.';
-
 $string['success_update_course'] = 'Success, course details have been updated in Examity.';
 $string['success_update_exam'] = 'Success, exam details have been updated in Examity.';
 $string['error_update_course'] = 'Sorry, course details could not be updated in Examity.';

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin administration pages are defined here.
+ * Plugin administration configurations are defined here.
  *
  * @package     quizaccess_examity
  * @category    admin
