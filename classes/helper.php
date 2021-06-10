@@ -17,24 +17,6 @@
 /**
  * Helper class to deal with examity api.
  * 
- * post_api 
- * get_examity_token
- * get_examity_user
- * get_examity_course
- * get_examity_exam
- * create_examity_user
- * create_examity_course
- * create_examity_exam
- * update_examity_user
- * update_examity_course
- * update_examity_exam
- * delete_examity_user
- * delete_examity_course
- * delete_examity_exam
- * select
- * insert
- * delete
-
  * @package    quizaccess_examity
  * @author     Ant
  * @copyright  2021 Catalyst IT
@@ -189,17 +171,22 @@ class helper {
             return $response;
         }
 
-        // if ($info['http_code'] != 200) {
-        //     debugging("cURL request for \"$url\" failed, HTTP response code: ".$response->response_code, DEBUG_ALL);
-        //     return false;
-        // }
-
         return $response->results;
     }
 
     /**
      * Get auth token from examity.
      *
+     * 
+     */
+
+    /**
+     * Get examity user by examity user_id.
+     *
+     * @param object $url - url for the curl request.
+     * @param int $client_id - client id for examity.
+     * @param object $username - username for examity auth.
+     * @param object $password - password for examity auth.
      * @return string $examity_token - get auth token from examity.
      */
     public static function get_examity_token($url, $client_id, $username, $password) {
@@ -225,7 +212,7 @@ class helper {
      * Get examity user by examity user_id.
      *
      * @param object $url - url for the curl request.
-     * @param object $examity_user_id - moodle user id.
+     * @param int $examity_user_id - moodle user id.
      * @param array $headers - set token in header.
      * @return string $examity_user - get user data stored in examity.
      */
@@ -249,7 +236,7 @@ class helper {
      * Get examity course by examity_course_id.
      *
      * @param object $url - url for the curl request.
-     * @param object $examity_course_id - moodle course.
+     * @param int $examity_course_id - moodle course.
      * @param array $headers set token in header.
      * @return string $examity_course - json of course data.
      */
@@ -275,7 +262,7 @@ class helper {
      * Get examity exam by examity_exam_id.
      *
      * @param object $url - url for the curl request.
-     * @param object $examity_exam_id - exam id from examity.
+     * @param int $examity_exam_id - exam id from examity.
      * @param array $headers set token in header.
      * @return string $examity_exam - return exam json.
      */
@@ -350,7 +337,7 @@ class helper {
      * Create course in examity based on moodle course being created.
      *
      * @param object $url - url for the curl request.
-     * @param object $examity_user_id - moodle user.
+     * @param int $examity_user_id - moodle user.
      * @param object $COURSE - moodle course.
      * @param array $headers set token in header.
      * @return string $examity_course
@@ -395,9 +382,9 @@ class helper {
      * Create examity exam based on moodle_user_id and moodle_course_id.
      *
      * @param object $url - url for the curl request.
-     * @param object $moodle_user - moodle user.
-     * @param object $examity_course_id - moodle course.
-     * @param object $moodle_exam - moodle exam.
+     * @param int $moodle_user_id - moodle user.
+     * @param int $examity_course_id - moodle course.
+     * @param int $moodle_exam_id - moodle exam.
      * @param array $headers set token in header. 
      * @return string $examity_exam
      */
@@ -471,25 +458,13 @@ class helper {
         return $examity_exam;
     }
 
-    // /**
-    //  * update examity user.
-    //  *
-    //  * @param object $examity_user moodle user id.
-    //  * @param array $headers set token in header.
-    //  * @return object
-    //  */
-    // public function update_examity_user($examity_user, $headers) {
-
-    //     $examity_user = null;
-
-    //     return $examity_user;
-    // }
-
     /**
      * update examity course based on examity_course_id.
      *
-     * @param int $examity_user moodle user id.
-     * @param object $moodle_course moodle course.
+     * @param int $examity_user_id examity user id.
+     * @param int $examity_course_id moodle course id.
+     * @param int $examity_exam_id examity exam id.
+     * @param object $COURSE moodle course.
      * @param array $headers set token in header.
      * @return string $examity_course examity course data.
      */
@@ -522,8 +497,9 @@ class helper {
      * update examity exam.
      *
      * @param object $url - url for the curl request.
-     * @param int $examity_user_id user id.
-     * @param int $examity_course_id examity course.
+     * @param int $moodle_user_id moodle user id.
+     * @param int $moodle_course_id moodle course id.
+     * @param int $moodle_exam_id moodle course id.
      * @param int $examity_exam_id examity exam.
      * @param array $headers set token in header.
      * @return string $examity_exam - examity exam data.
@@ -641,7 +617,7 @@ class helper {
      * delete examity course.
      *
      * @param object $url of the examity api.
-     * @param object $examity_course examity course.
+     * @param object $examity_course_id examity course id.
      * @param array $headers set token in header.
      * @return string $examity_course
      */
@@ -660,7 +636,7 @@ class helper {
      * delete examity exam.
      *
      * @param object $url of the examity api.
-     * @param object $examity_exam_id examity exam id.
+     * @param int $examity_exam_id examity exam id.
      * @param array $headers set token in header.
      * @return string $examity_exam examity exam data.
      */
@@ -704,8 +680,8 @@ class helper {
 
         global $DB;
         $id = null;
-
         $data_object = new stdClass();
+
         foreach($data as $key => $value) {
             $data_object->$key = optional_param($key, $value, PARAM_INT);
         }
@@ -713,32 +689,11 @@ class helper {
         $id = $DB->insert_record($db_table, $data_object, $returnid=true);
         return $id;
     }
-    
-    // /**
-    //  * update custom moodle database.
-    //  *
-    //  * @param array $data.
-    //  * @param string $db_table.
-    //  * @return object $id.
-    //  */
-    // public static function update($data, $db_table) {
-
-    //     global $DB;
-    //     $id = null;
-
-    //     $data_object = new stdClass();
-    //     foreach($data as $key => $value) {
-    //         $data_object->$key = optional_param($key, $value, PARAM_INT);
-    //     }
-
-    //     $id = $DB->update_record($db_table, $data_object, $returnid=true);
-    //     return $id;
-    // } 
 
     /**
      * delete record in custom moodle database.
      *
-     * @param array $data.
+     * @param string $table.
      * @param string $column.
      * @param string $value.
      * @return object $id.
@@ -751,6 +706,13 @@ class helper {
         return $id;
     } 
 
+    /**
+     * examity single sign on.
+     *
+     * @param string $moodle_course_id moodle course id.
+     * @param string $moodle_exam_id examity exam id.
+     * @return object $lti - data send to create single sign on link.
+     */
     public static function examity_sso($moodle_course_id, $moodle_exam_id) {
 
                 // create a sso link for this quiz
@@ -784,6 +746,5 @@ class helper {
 
                 return $lti;
     }
-
 }
 
