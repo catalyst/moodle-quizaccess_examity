@@ -196,11 +196,12 @@ class helper {
             \"username\":\"$username->value\",
             \"password\":\"$password->value\"
         }";
+
         $token = self::post_api($url->value .'/auth', 'create', $validation_data);
         $examity_token = json_decode($token, true);
 
-        if(!isset($examity_token['access_token'])){
-            $message = 'Examity could not authenticate your email and password, please check the your Examity configuration details';
+        if(!isset($examity_token['access_token'])) {
+            $message = get_string('error_auth','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
@@ -224,7 +225,8 @@ class helper {
         $examity_user = json_decode($examity_user_id, true);
 
         if(!isset($examity_user['user_id'])){
-            $message = 'Sorry, we could not find this user in Examity';
+
+            $message = get_string('error_get_user','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
@@ -250,7 +252,7 @@ class helper {
         $examity_course = json_decode($examity_course, true);
 
         if(!isset($examity_course['course_id'])){
-            $message = 'Sorry, we could not find this course in Examity';
+            $message = get_string('error_get_course','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
@@ -275,7 +277,7 @@ class helper {
         $examity_exam = json_decode($examity_exam, true);
 
         if(!isset($examity_exam['exam_id'])){
-            $message = 'Sorry, we could not find this exam in Examity';
+            $message = get_string('error_get_exam','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
@@ -325,7 +327,7 @@ class helper {
         $examity_user = json_decode($examity_user, true);
 
         if(!isset($examity_user['user_id'])){
-            $message = 'Sorry, we could not create this user in examity';
+            $message = get_string('error_create_user','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
@@ -363,14 +365,13 @@ class helper {
             $examity_course = json_decode($examity_course, true);
 
             if(!isset($examity_course['course_id'])){
-                $message = 'Sorry, we could not create this course in Examity';
+                $message = get_string('error_create_course','quizaccess_examity');
                 $messagetype = 'error';
                 \core\notification::add($message, $messagetype);
             }
 
         } else {
-
-            $message = 'Could not find a suitable user to create this course in Examity';
+            $message = get_string('error_create_course_with_user','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
@@ -449,8 +450,8 @@ class helper {
         $examity_exam = self::post_api($url, 'create', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
 
-        if(!isset($examity_exam['exam_id'])){
-            $message = 'Sorry, we could not create this exam in Examity';
+        if(!isset($examity_exam['exam_id'])) {
+            $message = get_string('error_create_exam','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }

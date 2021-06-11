@@ -239,7 +239,7 @@ class quizaccess_examity_observer {
                                 \core\notification::add($message, $messagetype);
                             }
                             
-                            // ask examity to get a course infered from the moodle_course_id
+                            // ask examity to get an exam infered from the moodle_exam_id
                             // if examity finds a course, it updates it's $COURSE data inside examity
                             //
                             if($examity_exam_id) {

@@ -51,6 +51,20 @@ $string['error_update_course'] = 'Sorry, course details could not be updated in 
 $string['error_update_exam'] = 'Sorry, exam details could not be updated in Examity.';
 $string['success_delete_exam'] = 'Success, your exam has been deleted from Examity.';
 $string['error_delete_exam'] = 'Sorry could not find this exam in Examity.';
+$string['error_get_user'] = 'Sorry, we could not find this user in Examity.';
+$string['error_get_course'] = 'Sorry, we could not find this course in Examity';
+$string['error_get_exam'] = 'Sorry, we could not find this exam in Examity';
+$string['error_create_user'] = 'Sorry, we could not create this user in examity';
+$string['error_create_course'] = 'Sorry, we could not create this course in Examity';
+$string['error_create_course_with_user'] = 'Could not find a suitable user to create this course in Examity';
+
+
+
+
+
+
+
+
 
 
 
