@@ -413,7 +413,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id; // TODO: $CFG->wwwroot should be used here.
+            $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
@@ -527,7 +527,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = 'https://examity.com'.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1'; // TODO: $CFG->wwwroot should be used here.
+            $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1'; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
