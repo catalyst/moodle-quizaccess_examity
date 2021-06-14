@@ -77,7 +77,7 @@ class quizaccess_examity extends quiz_access_rule_base {
         $moodle_exam_id = (int)$PAGE->cm->instance;
         $sso_url = false;
         $root_url = $CFG->wwwroot;
-        $examity_exam_id = $DB->get_record('examity_exam', ['moodle_exam_id' => $moodle_exam_id]);
+        $examity_exam_id = $DB->get_record('quizaccess_examity_exam', ['quiz' => $moodle_exam_id]);
 
         if($examity_exam_id) {
             $sso_url = '<a href="'. $root_url .'/mod/quiz/accessrule/examity/launch.php?moodle_exam_id='.$moodle_exam_id.'"><span>Click here to login into Examity</span></a>';
