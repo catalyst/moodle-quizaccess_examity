@@ -39,7 +39,7 @@ class quizaccess_examity_observer {
         global $USER;
         global $PAGE;
 
-        $examity_quiz_option_enabled = $_REQUEST['examity_enable_disable'] ?? null;
+        $examity_quiz_option_enabled = (int)optional_param('examity_enable_disable', 0, PARAM_INT);
         $examity_plugin_enabled = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_manage'])->value;
 
         if($examity_quiz_option_enabled == "0" && $examity_plugin_enabled == "1") {

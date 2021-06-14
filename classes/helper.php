@@ -721,7 +721,7 @@ class helper {
                 $lti->id = 3;
                 $lti->course = $moodle_course_id;
                 $lti->name = 'examity_sso';
-                $lti->intro = 'link for single sign on examity';
+                $lti->intro = '';
                 $lti->introformat = '1';
                 $lti->timecreated = '';
                 $lti->timemodified = '';
