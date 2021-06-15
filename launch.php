@@ -30,13 +30,17 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 use quizaccess_examity\helper;
 
 $url_params = $_SERVER['QUERY_STRING'];
-$id = (int)substr($url_params, strpos($url_params, "=") + 1);  
-$cm = $DB->get_record('course_modules', ['id' => $id], '*', MUST_EXIST);
-$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$exam_id = (int)substr($url_params, strpos($url_params, "=") + 1);  
 
-$lti = helper::examity_sso($course->id, $cm->id);
-$context = context_module::instance($cm->id);
+$exam = $DB->get_record('quiz', ['id' => $exam_id], '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $exam->course], '*', MUST_EXIST);
+$course_module = $DB->get_record('course_modules', ['instance' => $exam->id], '*', MUST_EXIST);
 
-require_login($course, true, $cm);
+$lti = helper::examity_sso($course->id, $course_module->id);
+$context = context_module::instance($course_module->id);
+
+require_login($course, true, $course_module);
 require_capability('mod/lti:view', $context);
 lti_launch_tool($lti);
+
+
