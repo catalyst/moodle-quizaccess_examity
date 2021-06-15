@@ -749,17 +749,12 @@ class helper {
     }
 
     /**
-     * get custom examity role
-     *
-     * @param string $table.
-     * @param string $column.
-     * @param string $value.
-     * @return object $id.
+     * create custom examity role
      */
     public static function get_examity_role() {
 
         global $DB;
-        create_role('Examity', 'examity', 'Gives access to examity API functions');
+        create_role('Examity', 'Examity', 'Gives access to examity API functions');
         $rolerecord = $DB->get_record('role', array("shortname" => 'examity'), $fields = '*');
         set_role_contextlevels($rolerecord->id, array(CONTEXT_SYSTEM));
 
