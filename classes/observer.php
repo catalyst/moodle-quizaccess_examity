@@ -67,17 +67,17 @@ class quizaccess_examity_observer {
             $url                    = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_url'], 'value');
     
             // Check whether the user, course or exam is already existing in the db
-            $examity_user_id        = $DB->get_record('quizaccess_examity_user', ['userid' => $moodle_user_id]);
+            $examity_user_id        = $DB->get_record('quizaccess_examity_u', ['userid' => $moodle_user_id]);
     
             if(isset($examity_user_id->examity_user_id)){
                 $examity_user_id = (int)$examity_user_id->examity_user_id;
     
             }
-            $examity_course_id      = $DB->get_record('quizaccess_examity_course', ['course' => $moodle_course_id]);
+            $examity_course_id      = $DB->get_record('quizaccess_examity_c', ['course' => $moodle_course_id]);
             if(isset($examity_course_id->examity_course_id)){
                 $examity_course_id = (int)$examity_course_id->examity_course_id;
             }
-            $examity_exam_id        = $DB->get_record('quizaccess_examity_exam', ['quiz' => $moodle_exam_id]);
+            $examity_exam_id        = $DB->get_record('quizaccess_examity_e', ['quiz' => $moodle_exam_id]);
             if(isset($examity_exam_id->examity_exam_id)){
                 $examity_exam_id = (int)$examity_exam_id->examity_exam_id;
             }  
@@ -106,7 +106,7 @@ class quizaccess_examity_observer {
                                         'examity_user_id' => $examity_user_id
                                     ];
             
-                                    $insert = helper::insert($data, 'quizaccess_examity_user');
+                                    $insert = helper::insert($data, 'quizaccess_examity_u');
         
                                     if($insert == false){
                                         $message = get_string('error_create_exam', 'quizaccess_examity');
@@ -135,7 +135,7 @@ class quizaccess_examity_observer {
                                         'examity_course_id' => $examity_course_id
                                     ];
         
-                                    $insert = helper::insert($data, 'quizaccess_examity_course');
+                                    $insert = helper::insert($data, 'quizaccess_examity_c');
     
                                     if($insert == false){
                                         $message = get_string('error_create_exam', 'quizaccess_examity');
@@ -163,7 +163,7 @@ class quizaccess_examity_observer {
                                         'examity_exam_id' => $examity_exam_id
                                     ];
             
-                                    $insert = helper::insert($data, 'quizaccess_examity_exam');
+                                    $insert = helper::insert($data, 'quizaccess_examity_e');
                                     if($insert == false){
                                         $message = get_string('error_create_exam', 'quizaccess_examity');
                                         $messagetype = 'error';
@@ -188,7 +188,7 @@ class quizaccess_examity_observer {
                                     'examity_course_id' => $examity_course_id,
                                 ];
         
-                                $insert = helper::insert($data, 'quizaccess_examity_user_course');
+                                $insert = helper::insert($data, 'quizaccess_examity_u_c');
         
                           
                                 // examity_user_exam
@@ -200,7 +200,7 @@ class quizaccess_examity_observer {
                                     'examity_exam_id' => $examity_exam_id,
                                 ];
         
-                                $insert = helper::insert($data, 'quizaccess_examity_user_exam');
+                                $insert = helper::insert($data, 'quizaccess_examity_u_e');
         
                                 // $examity_user   = helper::get_examity_user($url, $examity_user_id, $headers);
                                 // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
@@ -215,7 +215,7 @@ class quizaccess_examity_observer {
                                     'examity_exam_id' => $examity_exam_id,
                                 ];
         
-                                $insert = helper::insert($data, 'quizaccess_examity_course_exam');
+                                $insert = helper::insert($data, 'quizaccess_examity_c_e');
                                 $message = get_string('success_create_exam', 'quizaccess_examity');
                                 $messagetype = 'success';
                                 \core\notification::add($message, $messagetype);
@@ -293,9 +293,9 @@ class quizaccess_examity_observer {
     
                                     $examity_exam_id = $examity_exam['exam_id'];
                                     helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                                    helper::delete('quizaccess_examity_exam', 'examity_exam_id', $examity_exam_id);
-                                    helper::delete('quizaccess_examity_user_exam', 'examity_exam_id', $examity_exam_id);
-                                    helper::delete('quizaccess_examity_course_exam', 'examity_exam_id', $examity_exam_id);
+                                    helper::delete('quizaccess_examity_e', 'examity_exam_id', $examity_exam_id);
+                                    helper::delete('quizaccess_examity_u_e', 'examity_exam_id', $examity_exam_id);
+                                    helper::delete('quizaccess_examity_c_e', 'examity_exam_id', $examity_exam_id);
                                     $message = get_string('success_delete_exam', 'quizaccess_examity');
                                     $messagetype = 'success';
                                     \core\notification::add($message, $messagetype);

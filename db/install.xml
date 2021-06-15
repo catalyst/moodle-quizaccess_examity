@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES> 
-    <TABLE NAME="quizaccess_examity_user" COMMENT="associate the moodle user with the examity user">
+    <TABLE NAME="quizaccess_examity_u" COMMENT="associate the moodle user with the examity user">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
@@ -14,7 +14,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_examity_course" COMMENT="associate the moodle course with the examity_course">
+    <TABLE NAME="quizaccess_examity_c" COMMENT="associate the moodle course with the examity_course">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
@@ -24,7 +24,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_examity_exam" COMMENT="associate the moodle exam with the examity exam">
+    <TABLE NAME="quizaccess_examity_e" COMMENT="associate the moodle exam with the examity exam">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="quiz" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
@@ -34,7 +34,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_examity_user_course" COMMENT="examity users and courses">
+    <TABLE NAME="quizaccess_examity_u_c" COMMENT="examity users and courses">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
@@ -46,7 +46,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_examity_user_exam" COMMENT="examity user and exam">
+    <TABLE NAME="quizaccess_examity_u_e" COMMENT="examity user and exam">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
@@ -58,7 +58,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_examity_course_exam" COMMENT="examity courses and exams">
+    <TABLE NAME="quizaccess_examity_c_e" COMMENT="examity courses and exams">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
