@@ -413,7 +413,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1';; // TODO: $CFG->wwwroot should be used here.
+            $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1';
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
@@ -694,24 +694,35 @@ class helper {
     }
 
     /**
-     * create custom examity role
+     * Create custom examity role and assign capablities.
      */
     public static function get_examity_role() {
-
         global $DB;
-        create_role('Examity', 'examity', 'Gives access to examity API functions');
-        $rolerecord = $DB->get_record('role', array("shortname" => 'examity'), $fields = '*');
-        set_role_contextlevels($rolerecord->id, array(CONTEXT_SYSTEM));
+
+        $role = $DB->get_record('role', array("shortname" => 'examity'));
+        if (empty($role)) {
+            $roleid = create_role('Examity', 'examity', get_string('examityroledescription', 'quizaccess_examity'));
+        } else {
+            $roleid = $role->id;
+        }
+        set_role_contextlevels($roleid, array(CONTEXT_SYSTEM));
 
         $context = \context_system::instance();
-        assign_capability('quizzaccessrule/examity:get_course_contents', CAP_ALLOW, $rolerecord->id, $context->id, true);
-        assign_capability('quizzaccessrule/examity:get_enrolled_user', CAP_ALLOW, $rolerecord->id, $context->id, true);
-        assign_capability('quizzaccessrule/examity:get_quiz_by_course', CAP_ALLOW, $rolerecord->id, $context->id, true);
-        assign_capability('quizzaccessrule/examity:validate_parameters', CAP_ALLOW, $rolerecord->id, $context->id, true);
 
-        $context->mark_dirty();
-    } 
+        // This is the list of capabilties required by the webservices used by Examity.
+        $requiredcapabilities = ['moodle/course:update',
+                                 'moodle/course:viewhiddencourses',
+                                 'moodle/user:viewdetails',
+                                 'moodle/user:viewhiddendetails',
+                                 'moodle/course:useremail',
+                                 'moodle/user:update',
+                                 'moodle/site:accessallgroups',
+                                 'mod_quiz:view'];
+        foreach ($requiredcapabilities as $capability) {
+            assign_capability($capability, CAP_ALLOW, $roleid, $context->id, true);
+        }
 
-
+        accesslib_clear_role_cache($roleid);
+    }
 }
 
