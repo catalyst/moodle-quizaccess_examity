@@ -653,61 +653,6 @@ class helper {
     }
 
     /**
-     * select from custom moodle database.
-     *
-     * @param string $table.
-     * @param string $column.
-     * @param string $value.
-     * @return object $values.
-     */
-    public static function select($table, $column, $value) {
-        
-        global $DB;
-        $values = null;
-        $sql = "$column = $value";
-        $values = $DB->get_records_select($table, $sql);
-
-        return $values;
-    }
-
-    /**
-     * insert into custom moodle database.
-     *
-     * @param array $data.
-     * @param string $db_table.
-     * @return object $id.
-     */
-    public static function insert($data, $db_table) {
-
-        global $DB;
-        $id = null;
-        $data_object = new stdClass();
-
-        foreach($data as $key => $value) {
-            $data_object->$key = optional_param($key, $value, PARAM_INT);
-        }
-
-        $id = $DB->insert_record($db_table, $data_object, $returnid=true);
-        return $id;
-    }
-
-    /**
-     * delete record in custom moodle database.
-     *
-     * @param string $table.
-     * @param string $column.
-     * @param string $value.
-     * @return object $id.
-     */
-    public static function delete($table, $column, $value) {
-
-        global $DB;
-        $id = null;
-        $id = $DB->delete_records_select($table, "$column = $value");
-        return $id;
-    } 
-
-    /**
      * examity single sign on.
      *
      * @param string $moodle_course_id moodle course id.

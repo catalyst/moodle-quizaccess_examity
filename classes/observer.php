@@ -106,7 +106,7 @@ class quizaccess_examity_observer {
                                         'examity_user_id' => $examity_user_id
                                     ];
             
-                                    $insert = helper::insert($data, 'quizaccess_examity_u');
+                                    $insert = $DB->insert_record('quizaccess_examity_u', $data, $returnid=true);
         
                                     if($insert == false){
                                         $message = get_string('error_create_exam', 'quizaccess_examity');
@@ -135,7 +135,7 @@ class quizaccess_examity_observer {
                                         'examity_course_id' => $examity_course_id
                                     ];
         
-                                    $insert = helper::insert($data, 'quizaccess_examity_c');
+                                    $insert = $DB->insert_record('quizaccess_examity_c', $data, $returnid=true);
     
                                     if($insert == false){
                                         $message = get_string('error_create_exam', 'quizaccess_examity');
@@ -163,7 +163,8 @@ class quizaccess_examity_observer {
                                         'examity_exam_id' => $examity_exam_id
                                     ];
             
-                                    $insert = helper::insert($data, 'quizaccess_examity_e');
+                                    $insert = $DB->insert_record('quizaccess_examity_e', $data, $returnid=true);
+
                                     if($insert == false){
                                         $message = get_string('error_create_exam', 'quizaccess_examity');
                                         $messagetype = 'error';
@@ -188,9 +189,8 @@ class quizaccess_examity_observer {
                                     'examity_course_id' => $examity_course_id,
                                 ];
         
-                                $insert = helper::insert($data, 'quizaccess_examity_u_c');
-        
-                          
+                                $insert = $DB->insert_record('quizaccess_examity_u_c', $data, $returnid=true);
+
                                 // examity_user_exam
                                 $data = [
                                     'id' => null,
@@ -200,7 +200,8 @@ class quizaccess_examity_observer {
                                     'examity_exam_id' => $examity_exam_id,
                                 ];
         
-                                $insert = helper::insert($data, 'quizaccess_examity_u_e');
+                                $insert = $DB->insert_record('quizaccess_examity_u_e', $data, $returnid=true);
+
         
                                 // $examity_user   = helper::get_examity_user($url, $examity_user_id, $headers);
                                 // $examity_course = helper::get_examity_course($url, $examity_course_id, $headers);
@@ -215,7 +216,8 @@ class quizaccess_examity_observer {
                                     'examity_exam_id' => $examity_exam_id,
                                 ];
         
-                                $insert = helper::insert($data, 'quizaccess_examity_c_e');
+                                $insert = $DB->insert_record('quizaccess_examity_c_e', $data, $returnid=true);
+
                                 $message = get_string('success_create_exam', 'quizaccess_examity');
                                 $messagetype = 'success';
                                 \core\notification::add($message, $messagetype);
@@ -293,9 +295,9 @@ class quizaccess_examity_observer {
     
                                     $examity_exam_id = $examity_exam['exam_id'];
                                     helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                                    helper::delete('quizaccess_examity_e', 'examity_exam_id', $examity_exam_id);
-                                    helper::delete('quizaccess_examity_u_e', 'examity_exam_id', $examity_exam_id);
-                                    helper::delete('quizaccess_examity_c_e', 'examity_exam_id', $examity_exam_id);
+                                    $DB->delete_records_select('quizaccess_examity_e', "examity_exam_id=$examity_exam_id");
+                                    $DB->delete_records_select('quizaccess_examity_u_e', "examity_exam_id=$examity_exam_id");
+                                    $DB->delete_records_select('quizaccess_examity_c_e', "examity_exam_id=$examity_exam_id");
                                     $message = get_string('success_delete_exam', 'quizaccess_examity');
                                     $messagetype = 'success';
                                     \core\notification::add($message, $messagetype);
