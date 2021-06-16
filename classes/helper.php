@@ -413,7 +413,7 @@ class helper {
             $exam_level_id    = 2;
             $exam_name        = $quiz_record->name;
             $exam_start_date  = $quiz_record->timeopen;
-            $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id; // TODO: $CFG->wwwroot should be used here.
+            $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1';; // TODO: $CFG->wwwroot should be used here.
             $status_id        = 1;
             $allowed_attempts = (int)$quiz_record->attempts;
             $exam_code        = $quiz_record->name;
@@ -703,7 +703,7 @@ class helper {
         $rolerecord = $DB->get_record('role', array("shortname" => 'examity'), $fields = '*');
         set_role_contextlevels($rolerecord->id, array(CONTEXT_SYSTEM));
 
-        $context = context_system::instance();
+        $context = \context_system::instance();
         assign_capability('quizzaccessrule/examity:get_course_contents', CAP_ALLOW, $rolerecord->id, $context->id, true);
         assign_capability('quizzaccessrule/examity:get_enrolled_user', CAP_ALLOW, $rolerecord->id, $context->id, true);
         assign_capability('quizzaccessrule/examity:get_quiz_by_course', CAP_ALLOW, $rolerecord->id, $context->id, true);
