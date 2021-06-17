@@ -307,7 +307,6 @@ class helper {
         $phone2         = $USER->phone2;
         $country        = $USER->country;
         $timezone       = $USER->timezone;
-        $username       = $USER->username;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
