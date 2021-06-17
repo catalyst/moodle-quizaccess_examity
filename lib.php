@@ -29,7 +29,6 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-require_once($CFG->dirroot.'/plagiarism/lib.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 
 /**
@@ -40,13 +39,11 @@ require_once($CFG->dirroot . '/lib/filelib.php');
  * @param object $mform
  */
 function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform) {
-    
-    global $DB;
     $modulename = $formwrapper->get_current()->modulename;
 
     if ($modulename == 'quiz') {
-
-        $attributes = array(0 => 'Enable', 1 => 'Disable');
+        $attributes = array(1 => get_string('enable', 'quizaccess_examity'),
+                            0 => get_string('disable', 'quizaccess_examity'));
         $mform->addElement('header', 'examity', 'Examity');
         $mform->addElement('select', 'examity_enable_disable', get_string('select_field', 'quizaccess_examity'), $attributes);
         $mform->setDefault('examity_enable_disable', 1);
@@ -59,50 +56,19 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
  * @param object $data
  * @return array $files
  */
-function quizaccess_examity_coursemodule_validation($data, $files) {
+function quizaccess_examity_coursemodule_validation($mform) {
+    $data = $mform->get_submitted_data();
 
-    $errors = array();
-    global $DB;
-
-    $examity_enabled = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_manage'], 'value');
-
-    // only validate if examity is switched on and enabled.
-    if($examity_enabled->value != false && $examity_enabled->value == "1" && $files['examity_enable_disable'] == "0") {
-
-        foreach($files as $key => $value) {
-
-            //
-            // examity needs password
-            // 
-            if($key == 'quizpassword' && $value == ""){
-                $errors['password'] = 'Requires password to be set';
-                return $errors;
+    $errors = [];
+    if (!empty($data->examity_enable_disable)) {
+        // If examity is enabled, we also need some other quiz settings to be enabled.
+        $requiredvars = ['quizpassword', 'timeopen', 'timeclosed', 'timelimit'];
+        foreach ($requiredvars as $req) {
+            if (empty($data->$req)) {
+                $errors[$req] = get_string($req.'_required', 'quizaccess_examity');
             }
-
-            //
-            // examity needs timeopen
-            // 
-            if($key == 'timeopen' && $value == "0"){
-                $errors['timeopen'] = 'Exam open must be greater than zero';
-                return $errors;
-            }
-
-            //
-            // examity needs timeclosed
-            // 
-            if($key == 'timeclosed' && $value == "0"){
-                $errors['timeclosed'] = 'Exam closed must be greater than zero';
-                return $errors;
-            }
-
-            //
-            // examity needs exam duration
-            // 
-            if($key == 'timelimit' && $value == "0"){
-                $errors['timelimit'] = 'Duration must be greater than zero';
-                return $errors;
-            }
-
         }
+
     }
+    return $errors;
 }
