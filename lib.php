@@ -62,7 +62,7 @@ function quizaccess_examity_coursemodule_validation($mform) {
     $errors = [];
     if (!empty($data->examity_enable_disable)) {
         // If examity is enabled, we also need some other quiz settings to be enabled.
-        $requiredvars = ['quizpassword', 'timeopen', 'timeclosed', 'timelimit'];
+        $requiredvars = ['quizpassword', 'timeopen', 'timeclose', 'timelimit'];
         foreach ($requiredvars as $req) {
             if (empty($data->$req)) {
                 $errors[$req] = get_string($req.'_required', 'quizaccess_examity');
