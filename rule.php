@@ -48,7 +48,13 @@ class quizaccess_examity extends quiz_access_rule_base {
      * @return quiz_access_rule_base|null the rule, if applicable, else null.
      */
     public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
-        return new self($quizobj, $timenow);
+        global $DB;
+        if ($DB->record_exists('quizaccess_examity_e', ['quiz' => $quizobj->get_quizid()])) {
+            // Only return if this quiz is set to use examity.
+            return new self($quizobj, $timenow);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -69,22 +75,18 @@ class quizaccess_examity extends quiz_access_rule_base {
      *      reason if access should be prevented.
      */
     public function prevent_access() {
+        global $PAGE, $DB;
 
-        global $PAGE;
-        global $CFG;
-        global $DB;
-        
-        $examity_quiz_option_enabled = optional_param('useexamity', 0, PARAM_INT);
-        $moodle_exam_id = (int)$PAGE->cm->instance;
-        $sso_url = false;
-        $root_url = $CFG->wwwroot;
-        $examity_exam_id = $DB->get_record('quizaccess_examity_e', ['quiz' => $moodle_exam_id]);
+        $proctorlogin = optional_param('useexamity', 0, PARAM_INT);
+        $quiz = $PAGE->cm->instance;
+        $examityenabled = $DB->record_exists('quizaccess_examity_e', ['quiz' => $quiz]);
 
-        if($examity_exam_id && $examity_quiz_option_enabled == 0) {
-            $sso_url = '<a href="'. $root_url .'/mod/quiz/accessrule/examity/launch.php?moodle_exam_id='.$moodle_exam_id.'"><span>Click here to login into Examity</span></a>';
+        if($examityenabled && !empty($proctorlogin)) {
+            $url = new moodle_url('/mod/quiz/accessrule/examity/launch.php', ['moodle_exam_id' => $quiz]);
+            return html_writer::link($url, get_string('logintoexamity', 'quizaccess_examity'));
         }
 
-        return $sso_url;
+        return null;
     }
 
 }

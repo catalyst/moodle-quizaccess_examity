@@ -717,7 +717,7 @@ class helper {
                                  'moodle/course:useremail',
                                  'moodle/user:update',
                                  'moodle/site:accessallgroups',
-                                 'mod_quiz:view'];
+                                 'mod/quiz:view'];
         foreach ($requiredcapabilities as $capability) {
             assign_capability($capability, CAP_ALLOW, $roleid, $context->id, true);
         }

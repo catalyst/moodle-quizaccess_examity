@@ -32,7 +32,7 @@ if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
 
         $settings->add(new admin_setting_configcheckbox('quizaccess_examity/examity_manage',
-        get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 1));
+        get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 0));
 
         $settings->add(new admin_setting_configtext('quizaccess_examity/consumer_username',
         get_string('consumer_username', 'quizaccess_examity'),

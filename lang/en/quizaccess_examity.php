@@ -59,18 +59,10 @@ $string['error_create_course'] = 'Sorry, we could not create this course in Exam
 $string['error_create_course_with_user'] = 'Could not find a suitable user to create this course in Examity';
 $string['examityroledescription'] = 'Gives access to examity API functions';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$string['quizpassword_required'] = 'Examity requires a quiz password to be set.';
+$string['timeopen_required'] = 'Examity requires a quiz open value to be set.';
+$string['timeclose_required'] = 'Examity requires a quiz close time to be set.';
+$string['timelimit_required'] = 'Examity requires a quiz time limit to be set.';
+$string['disable'] = 'Disable';
+$string['enable'] = 'Enable';
+$string['logintoexamity'] = 'Click here to login into Examity';
