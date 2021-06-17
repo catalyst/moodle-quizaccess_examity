@@ -319,7 +319,7 @@ class helper {
                         \"country_code\":$country_code,
                         \"timezone_id\":$timezone_id,
                         \"metadata\":{},
-                        \"username\":\"$username\",
+                        \"username\":\"$email\",
                         \"send_password_reset_email\":true
         }";
 
