@@ -307,7 +307,6 @@ class helper {
         $phone2         = $USER->phone2;
         $country        = $USER->country;
         $timezone       = $USER->timezone;
-        $username       = $USER->username;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
@@ -319,7 +318,7 @@ class helper {
                         \"country_code\":$country_code,
                         \"timezone_id\":$timezone_id,
                         \"metadata\":{},
-                        \"username\":\"$username\",
+                        \"username\":\"$email\",
                         \"send_password_reset_email\":true
         }";
 
