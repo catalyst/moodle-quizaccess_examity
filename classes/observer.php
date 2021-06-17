@@ -295,9 +295,9 @@ class quizaccess_examity_observer {
     
                                     $examity_exam_id = $examity_exam['exam_id'];
                                     helper::delete_examity_exam($url, $examity_exam_id, $headers);
-                                    $DB->delete_records_select('quizaccess_examity_e', "examity_exam_id=$examity_exam_id");
-                                    $DB->delete_records_select('quizaccess_examity_u_e', "examity_exam_id=$examity_exam_id");
-                                    $DB->delete_records_select('quizaccess_examity_c_e', "examity_exam_id=$examity_exam_id");
+                                    $DB->delete_records('quizaccess_examity_e', ['examity_exam_id' =>  $examity_exam_id]);
+                                    $DB->delete_records('quizaccess_examity_u_e', ['examity_exam_id' =>  $examity_exam_id]);
+                                    $DB->delete_records('quizaccess_examity_c_e', ['examity_exam_id' =>  $examity_exam_id]);
                                     $message = get_string('success_delete_exam', 'quizaccess_examity');
                                     $messagetype = 'success';
                                     \core\notification::add($message, $messagetype);
