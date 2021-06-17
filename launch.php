@@ -34,8 +34,7 @@ $exam_id = (int)substr($url_params, strpos($url_params, "=") + 1);
 
 $exam = $DB->get_record('quiz', ['id' => $exam_id], '*', MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $exam->course], '*', MUST_EXIST);
-$course_module = $DB->get_record('course_modules', ['instance' => $exam->id], '*', MUST_EXIST);
-
+$course_module = get_coursemodule_from_instance('quiz', $exam_id);
 $lti = helper::examity_sso($course->id, $course_module->id);
 $context = context_module::instance($course_module->id);
 
