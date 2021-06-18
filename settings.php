@@ -32,7 +32,7 @@ if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
 
         $settings->add(new admin_setting_configcheckbox('quizaccess_examity/examity_manage',
-        get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 0));
+        get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 1));
 
         $settings->add(new admin_setting_configtext('quizaccess_examity/consumer_username',
         get_string('consumer_username', 'quizaccess_examity'),
@@ -59,4 +59,13 @@ if ($hassiteconfig) {
         get_string('examity_url_help', 'quizaccess_examity'), '', PARAM_TEXT, 30));
     }
 
+    $ADMIN->add(
+        'root', 
+        new admin_externalpage(
+            'local_custom_links', 
+            'Examity web services', 
+            new moodle_url('/mod/quiz/accessrule/examity/examity_default.php'), 
+           'moodle/site:config' 
+       )
+    );
 }
