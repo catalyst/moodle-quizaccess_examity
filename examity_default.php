@@ -23,7 +23,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("../../../../config.php");
+require_once(dirname(__FILE__) . "/../../../../config.php");
 require_once('defaults_form.php');
 
 require_login();
@@ -31,6 +31,10 @@ require_login();
 $context = context_system::instance();
 $PAGE->set_url($CFG->wwwroot.'/mod/quiz/accessrule/examity_default.php');
 $PAGE->set_context($context);
+$PAGE->set_title(get_string('examity_web_services', 'quizaccess_examity'));
+$PAGE->set_heading(get_string('onesystemcontrolling', 'webservice'));
+$PAGE->navbar->add(get_string('examity_web_services', 'quizaccess_examity'));
+
 
 echo $OUTPUT->header();
 
