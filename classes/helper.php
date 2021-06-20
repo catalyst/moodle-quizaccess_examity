@@ -27,8 +27,6 @@ namespace quizaccess_examity;
 use curl;
 use stdClass;
 
-global $CFG, $DB;
-
 defined('MOODLE_INTERNAL') || die();
 class helper {
 
@@ -387,11 +385,7 @@ class helper {
      * @return string $examity_exam
      */
     public static function create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $headers) {
-
-        global $USER;
-        global $COURSE;
-        global $DB;
-        global $CFG;
+        global $DB, $CFG;
         $postdata = null;
         $examity_exam = null;
         $url = $url->value . '/exams';
@@ -500,9 +494,7 @@ class helper {
      * @return string $examity_exam - examity exam data.
      */
     public static function update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers) {
-
-        global $DB;
-        global $CFG;
+        global $DB, $CFG;
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
         $url = $url->value . '/exams' . '/' . (int)$examity_exam_id;
         $postdata = null;

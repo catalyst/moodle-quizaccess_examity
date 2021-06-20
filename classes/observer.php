@@ -26,18 +26,13 @@
 defined('MOODLE_INTERNAL') || die;
 
 use quizaccess_examity\helper;
-use moodle\mod\lti as lti;
-require_once($CFG->dirroot.'/mod/lti/lib.php');
-require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 class quizaccess_examity_observer {
 
     public static function update(\core\event\base $event) {
-        
         global $DB;
         global $COURSE;
         global $USER;
-        global $PAGE;
 
         $examityquizenabled = optional_param('examity_enable_disable', 0, PARAM_INT);
         $examity_plugin_enabled = $DB->get_record('config_plugins', ['plugin' => 'quizaccess_examity', 'name' => 'examity_manage'])->value;
