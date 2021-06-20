@@ -338,44 +338,42 @@ class helper {
      * Create course in examity based on moodle course being created.
      *
      * @param object $url - url for the curl request.
-     * @param int $examity_user_id - moodle user.
-     * @param object $COURSE - moodle course.
+     * @param int $examityuserid - moodle user.
+     * @param object $course - moodle course.
      * @param array $headers set token in header.
-     * @return string $examity_course
+     * @return string $examitycourse
      */
-    public static function create_examity_course($url, $examity_user_id, $COURSE, $headers) {
+    public static function create_examity_course($url, $examityuserid, $course, $headers) {
 
-        $examity_course = null;
-        $postdata = null;
+        $examitycourse = null;
+        $coursecode = self::get_courseidentifier($course);
         $url = $url->value . '/courses';
-        $primary_instructor_id = (int)$examity_user_id;
+        $primary_instructor_id = (int)$examityuserid;
 
-        if($primary_instructor_id){
+        if ($primary_instructor_id) {
             $postdata = "{
-                \"course_code\":\"$COURSE->fullname\",
-                \"course_name\":\"$COURSE->fullname\",
+                \"course_code\":\"$coursecode\",
+                \"course_name\":\"$course->fullname\",
                 \"primary_instructor_id\":$primary_instructor_id,
                 \"instructor_ids\":[$primary_instructor_id],
                 \"status_id\":1,
                 \"metadata\":{}
             }";
 
-            $examity_course = self::post_api($url, 'create', $postdata, $headers);
-            $examity_course = json_decode($examity_course, true);
+            $examitycourse = self::post_api($url, 'create', $postdata, $headers);
+            $examitycourse = json_decode($examitycourse, true);
 
-            if(!isset($examity_course['course_id'])){
+            if (!isset($examitycourse['course_id'])) {
                 $message = get_string('error_create_course','quizaccess_examity');
                 $messagetype = 'error';
                 \core\notification::add($message, $messagetype);
             }
-
         } else {
             $message = get_string('error_create_course_with_user','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
         }
-
-        return $examity_course;
+        return $examitycourse;
     }
 
     /**
@@ -461,28 +459,25 @@ class helper {
     /**
      * update examity course based on examity_course_id.
      *
-     * @param int $examity_user_id examity user id.
-     * @param int $examity_course_id moodle course id.
-     * @param int $examity_exam_id examity exam id.
+     * @param int $examityuserid examity user id.
+     * @param int $examitycourseid moodle course id.
      * @param object $COURSE moodle course.
      * @param array $headers set token in header.
      * @return string $examity_course examity course data.
      */
-    public static function update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers) {
+    public static function update_examity_course($url, $examityuserid, $examitycourseid, $course, $headers) {
 
-        $examity_course = null;
-
-        $url = $url->value . '/courses' . '/' . (int)$examity_course_id;
-        $course_code = (int)$COURSE->id; 
-        $course_name = $COURSE->fullname;
-        $primary_instructor_id = (int)$examity_user_id;
-        $instructor_ids = (int)$examity_user_id;
+        $url = $url->value . '/courses' . '/' . (int)$examitycourseid;
+        $coursename = $course->fullname;
+        $coursecode = self::get_courseidentifier($course);
+        $primaryinstructorid = (int)$examityuserid;
+        $instructorid = (int)$examityuserid;
 
         $postdata = "{
-                        \"course_code\":\"$course_name\",
-                        \"course_name\":\"$course_name\",
-                        \"primary_instructor_id\":$primary_instructor_id,
-                        \"instructor_ids\":[$instructor_ids],
+                        \"course_code\":\"$coursecode\",
+                        \"course_name\":\"$coursename\",
+                        \"primary_instructor_id\":$primaryinstructorid,
+                        \"instructor_ids\":[$instructorid],
                         \"status_id\":1,
                         \"metadata\":{}
                     }";
@@ -722,6 +717,18 @@ class helper {
         }
 
         accesslib_clear_role_cache($roleid);
+    }
+
+    /**
+     * Get unique indentifier for course.
+     *
+     * @param $course
+     * @return string
+     */
+    public static function get_courseidentifier($course) {
+        global $CFG;
+        // We use the first 6 chars of the siteidentifier to prevent issues when the same examity account is used on multiple sites.
+        return (substr($CFG->siteindentifier, 0, 6)."_".$course->id."_".$course->shortname);
     }
 }
 

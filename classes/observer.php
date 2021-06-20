@@ -231,7 +231,7 @@ class quizaccess_examity_observer {
                             // if examity finds a course, it updates it's $COURSE data inside examity
                             //
                             if($examity_course_id) {
-                                $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $examity_exam_id, $COURSE, $headers);
+                                $examity_course_id = helper::update_examity_course($url, $examity_user_id, $examity_course_id, $COURSE, $headers);
                                 $message = get_string('success_update_course', 'quizaccess_examity');
                                 $messagetype = 'success';
                                 \core\notification::add($message, $messagetype);
