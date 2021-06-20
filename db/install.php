@@ -15,11 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Post installation procedure to create role 
+ * Add examity role for webservices.
+ *
+ * @package   quizaccess_examity
+ * @copyright 2021 Catalyst IT
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-use quizaccess_examity\helper;
 
+defined('MOODLE_INTERNAL') || die();
+
+use quizaccess_examity\helper;
 
 function xmldb_quizaccess_examity_install() {
 

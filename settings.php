@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
 
     $settings = new admin_settingpage('quizaccess_examity', new lang_string('pluginname', 'quizaccess_examity'));
- 
     if ($ADMIN->fulltree) {
 
         $settings->add(new admin_setting_configcheckbox('quizaccess_examity/examity_manage',
@@ -60,12 +59,12 @@ if ($hassiteconfig) {
     }
 
     $ADMIN->add(
-        'root', 
+        'root',
         new admin_externalpage(
-            'local_custom_links', 
-            'Examity web services', 
-            new moodle_url('/mod/quiz/accessrule/examity/examity_default.php'), 
-           'moodle/site:config' 
+            'local_custom_links',
+            'Examity web services',
+            new moodle_url('/mod/quiz/accessrule/examity/examity_default.php'),
+           'moodle/site:config'
        )
     );
 }

@@ -17,23 +17,20 @@
 /**
  * Implementaton of the quizaccess_examity.
  *
- * @package    quizaccess
- * @subpackage examity
- * @copyright  2021 Catalyst 
+ * @package    quizaccess_examity
+ * @copyright  2021 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
 
-
 /**
- * A rule implementing examity sso 
+ * A rule implementing examity sso
  *
- * @copyright  2021 Ant
+ * @copyright  2021 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quizaccess_examity extends quiz_access_rule_base {
@@ -81,7 +78,7 @@ class quizaccess_examity extends quiz_access_rule_base {
         $quiz = $PAGE->cm->instance;
         $examityenabled = $DB->record_exists('quizaccess_examity_e', ['quiz' => $quiz]);
 
-        if($examityenabled && !empty($proctorlogin)) {
+        if ($examityenabled && !empty($proctorlogin)) {
             $url = new moodle_url('/mod/quiz/accessrule/examity/launch.php', ['moodle_exam_id' => $quiz]);
             return html_writer::link($url, get_string('logintoexamity', 'quizaccess_examity'));
         }

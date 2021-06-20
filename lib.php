@@ -17,23 +17,17 @@
 /**
  * lib.php - Contains Quiz Access Examity plugin specific functions.
  *
- * @since 2.0
- * @package    quizaccess_plugin_examity
- * @subpackage examity
- * @author     Ant 
- * @copyright  2021
+ * @package    quizaccess_examity
+ * @author     Ant
+ * @copyright  2021 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
-}
-
-require_once($CFG->dirroot . '/lib/filelib.php');
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * add ability for the teacher to enable examity within a quiz.
- * allows a plugin to inject elements into a coursemodule editing form. 
+ * Add ability for the teacher to enable examity within a quiz
+ * allows a plugin to inject elements into a coursemodule editing form.
  *
  * @param object $formwrapper
  * @param object $mform
@@ -51,10 +45,10 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
 }
 
 /**
- * validate the data in the new field when the form is submitted
+ * Validate the data in the new field when the form is submitted.
  *
  * @param object $data
- * @return array $files
+ * @return array $errors
  */
 function quizaccess_examity_coursemodule_validation($mform) {
     $data = $mform->get_submitted_data();

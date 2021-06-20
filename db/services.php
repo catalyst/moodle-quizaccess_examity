@@ -14,7 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// We define the services to install as pre-build services. A pre-build service is not editable by administrator.
+/**
+ * Custom webservices function for examity.
+ *
+ * @package   quizaccess_examity
+ * @copyright 2021 Catalyst IT
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
 $services = array(
     'Examity' => array(
         'functions' => array(

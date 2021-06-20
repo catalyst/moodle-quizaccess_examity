@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * List of extra configuration steps required by Examity.
  *
  * @package quizaccess_examity
  * @author Ant
- * @copyright 2021 
+ * @copyright 2021
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -52,7 +52,7 @@ $table->data = array();
 $return .= $brtag . get_string('onesystemcontrollingdescription', 'webservice')
         . $brtag . $brtag;
 
-// Enable Web Services
+// Enable Web Services.
 $row = array();
 $url = new moodle_url("/admin/search.php?query=enablewebservices");
 $row[0] = "1. " . html_writer::tag('a', get_string('enablews', 'webservice'),
@@ -65,18 +65,18 @@ $row[1] = $status;
 $row[2] = get_string('enablewsdescription', 'webservice');
 $table->data[] = $row;
 
-// Enable protocols
+// Enable protocols.
 $row = array();
 $url = new moodle_url("/admin/settings.php?section=webserviceprotocols");
 $row[0] = "2. " . html_writer::tag('a', get_string('enableprotocols', 'webservice'),
                 array('href' => $url));
 $status = html_writer::tag('span', get_string('none'), array('class' => 'badge badge-danger'));
-//retrieve activated protocol
-$active_protocols = empty($CFG->webserviceprotocols) ?
+// Retrieve activated protocol.
+$activeprotocols = empty($CFG->webserviceprotocols) ?
         array() : explode(',', $CFG->webserviceprotocols);
-if (!empty($active_protocols)) {
+if (!empty($activeprotocols)) {
     $status = "";
-    foreach ($active_protocols as $protocol) {
+    foreach ($activeprotocols as $protocol) {
         $status .= $protocol . $brtag;
     }
 }
@@ -84,7 +84,7 @@ $row[1] = $status;
 $row[2] = get_string('enableprotocolsdescription', 'webservice');
 $table->data[] = $row;
 
-// Create user account
+// Create user account.
 $row = array();
 $url = new moodle_url("/user/editadvanced.php?id=-1");
 $row[0] = "3. " . html_writer::tag('a', get_string('createuser', 'webservice'),
@@ -93,7 +93,7 @@ $row[1] = "";
 $row[2] = get_string('createuserdescription', 'webservice');
 $table->data[] = $row;
 
-// Add capability to users
+// Add capability to users.
 $row = array();
 $url = new moodle_url("/admin/roles/check.php?contextid=1");
 $row[0] = "4. " . html_writer::tag('a', get_string('checkusercapability', 'webservice'),
@@ -102,7 +102,7 @@ $row[1] = "";
 $row[2] = get_string('checkusercapabilitydescription', 'webservice');
 $table->data[] = $row;
 
-// Create token for the specific user
+// Create token for the specific user.
 $row = array();
 $url = new moodle_url("/admin/webservice/tokens.php?sesskey=" . sesskey() . "&action=create");
 $row[0] = "5. " . html_writer::tag('a', get_string('createtokenforuser', 'webservice'),
