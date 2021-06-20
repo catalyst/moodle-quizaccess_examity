@@ -289,24 +289,24 @@ class helper {
      * Create examity user.
      *
      * @param object $url - url for the curl request.
-     * @param object $USER - moodle user details.
+     * @param object $user - moodle user details.
      * @param array $headers set token in header.
      * @return string $examity_user - user details created in examity.
      */
-    public static function create_examity_user($url, $USER, $headers) {
+    public static function create_examity_user($url, $user, $headers) {
 
         $examity_user = null;
-        $country_code = (int)$USER->country;
-        $timezone_id = (int)$USER->timezone;
+        $country_code = (int)$user->country;
+        $timezone_id = (int)$user->timezone;
         $url = $url->value . '/users';
 
-        $firstname      = $USER->firstname;
-        $lastname       = $USER->lastname;
-        $email          = $USER->email;
-        $picture        = $USER->picture;
-        $phone2         = $USER->phone2;
-        $country        = $USER->country;
-        $timezone       = $USER->timezone;
+        $firstname      = $user->firstname;
+        $lastname       = $user->lastname;
+        $email          = $user->email;
+        $picture        = $user->picture;
+        $phone2         = $user->phone2;
+        $country        = $user->country;
+        $timezone       = $user->timezone;
 
         $postdata = "{
                         \"first_name\":\"$firstname\",
@@ -461,7 +461,7 @@ class helper {
      *
      * @param int $examityuserid examity user id.
      * @param int $examitycourseid moodle course id.
-     * @param object $COURSE moodle course.
+     * @param object $course moodle course.
      * @param array $headers set token in header.
      * @return string $examity_course examity course data.
      */
