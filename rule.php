@@ -79,7 +79,7 @@ class quizaccess_examity extends quiz_access_rule_base {
         $examityenabled = $DB->record_exists('quizaccess_examity_e', ['quiz' => $quiz]);
 
         if ($examityenabled && !empty($proctorlogin)) {
-            $url = new moodle_url('/mod/quiz/accessrule/examity/launch.php', ['moodle_exam_id' => $quiz]);
+            $url = new moodle_url('/mod/quiz/accessrule/examity/launch.php', ['id' => $PAGE->cm->id]);
             return html_writer::link($url, get_string('logintoexamity', 'quizaccess_examity'));
         }
 
