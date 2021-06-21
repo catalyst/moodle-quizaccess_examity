@@ -291,8 +291,8 @@ class helper {
      * @return string $examity_user - user details created in examity.
      */
     public static function create_examity_user($url, $user, $token) {
+        global $DB;
 
-        $examity_user = null;
         $country_code = (int)$user->country;
         $timezone_id = (int)$user->timezone;
         $url = $url . '/users';
@@ -319,16 +319,23 @@ class helper {
                         \"send_password_reset_email\":true
         }";
 
-        $examity_user = self::post_api($url, 'create', $postdata, $token);
-        $examity_user = json_decode($examity_user, true);
+        $examityuser = self::post_api($url, 'create', $postdata, $token);
+        $examityuser = json_decode($examityuser, true);
 
         if(!isset($examity_user['user_id'])){
             $message = get_string('error_create_user','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
-        }
+        } else {
+            $data = [
+                    'id' => null,
+                    'userid' => $user->id,
+                    'examity_user_id' => $examityuser['user_id']
+                    ];
 
-        return $examity_user;
+            $DB->insert_record('quizaccess_examity_u', $data);
+            return $examity_user;
+        }
     }
 
     /**
@@ -341,35 +348,36 @@ class helper {
      * @return string $examitycourse
      */
     public static function create_examity_course($url, $examityuserid, $course, $examitytoken) {
-
-        $examitycourse = null;
+        global $DB;
         $coursecode = self::get_courseidentifier($course);
         $url = $url . '/courses';
-        $primary_instructor_id = (int)$examityuserid;
 
-        if ($primary_instructor_id) {
-            $postdata = "{
+        $postdata = "{
                 \"course_code\":\"$coursecode\",
                 \"course_name\":\"$course->fullname\",
-                \"primary_instructor_id\":$primary_instructor_id,
-                \"instructor_ids\":[$primary_instructor_id],
+                \"primary_instructor_id\":$examityuserid,
+                \"instructor_ids\":[$examityuserid],
                 \"status_id\":1,
                 \"metadata\":{}
             }";
 
-            $examitycourse = self::post_api($url, 'create', $postdata, $examitytoken);
-            $examitycourse = json_decode($examitycourse, true);
+        $examitycourse = self::post_api($url, 'create', $postdata, $examitytoken);
+        $examitycourse = json_decode($examitycourse, true);
 
-            if (!isset($examitycourse['course_id'])) {
-                $message = get_string('error_create_course','quizaccess_examity');
-                $messagetype = 'error';
-                \core\notification::add($message, $messagetype);
-            }
-        } else {
-            $message = get_string('error_create_course_with_user','quizaccess_examity');
+        if (!isset($examitycourse['course_id'])) {
+            $message = get_string('error_create_course', 'quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
+        } else {
+            $data = [
+                'id' => null,
+                'course' => $course->id,
+                'examity_course_id' => $examitycourse['course_id']
+            ];
+
+            $DB->insert_record('quizaccess_examity_c', $data);
         }
+
         return $examitycourse;
     }
 
@@ -386,29 +394,28 @@ class helper {
     public static function create_examity_exam($url, $moodle_user_id, $examity_course_id, $moodle_exam_id, $token) {
         global $DB, $CFG;
         $postdata = null;
-        $examity_exam = null;
         $url = $url . '/exams';
-        $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
+        $quiz = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
 
-        if(isset($quiz_record->id)){
+        if(isset($quiz->id)){
 
             $course_id        = (int)$examity_course_id;
-            $duration         = $quiz_record->timelimit;
-            $exam_end_date    = $quiz_record->timeclose; 
+            $duration         = $quiz->timelimit;
+            $exam_end_date    = $quiz->timeclose;
             $rule_id          = 0;
             $rule_description = null;
             $for_student      = true;
             $for_proctor      = true;
             $display_order    = 0;
             $exam_level_id    = 2;
-            $exam_name        = $quiz_record->name;
-            $exam_start_date  = $quiz_record->timeopen;
+            $exam_name        = $quiz->name;
+            $exam_start_date  = $quiz->timeopen;
             $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1';
             $status_id        = 1;
-            $allowed_attempts = (int)$quiz_record->attempts;
-            $exam_code        = $quiz_record->name;
-            $exam_password    = $quiz_record->password;
-            $exam_username    = $quiz_record->name;
+            $allowed_attempts = (int)$quiz->attempts;
+            $exam_code        = $quiz->name;
+            $exam_password    = $quiz->password;
+            $exam_username    = $quiz->name;
             $is_student_upload_file = true;
             $userId = null;
             $testtakerUrl = null;
@@ -437,16 +444,29 @@ class helper {
 
         }
 
-        $examity_exam = self::post_api($url, 'create', $postdata, $token);
-        $examity_exam = json_decode($examity_exam, true);
+        $examityexam = self::post_api($url, 'create', $postdata, $token);
+        $examityexam = json_decode($examityexam, true);
 
-        if(!isset($examity_exam['exam_id'])) {
+        if(!isset($examityexam['exam_id'])) {
             $message = get_string('error_create_exam','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
-        }
+            return false;
+        } else {
+            $data = [
+                    'id' => null,
+                    'quiz' => $quiz->id,
+                    'examity_exam_id' => $examityexam['exam_id']
+                    ];
 
-        return $examity_exam;
+            $DB->insert_record('quizaccess_examity_e', $data);
+
+            $message = get_string('success_create_exam', 'quizaccess_examity');
+            $messagetype = 'success';
+            \core\notification::add($message, $messagetype);
+
+            return $examityexam;
+        }
     }
 
     /**
@@ -494,30 +514,30 @@ class helper {
      */
     public static function update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $token) {
         global $DB, $CFG;
-        $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
+        $quiz = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
         $url = $url . '/exams' . '/' . (int)$examity_exam_id;
         $postdata = null;
 
-        if(isset($quiz_record->id)){
+        if(isset($quiz->id)){
 
             $examity_exam = null;
-            $course_id        = (int)$quiz_record->course;
-            $duration         = $quiz_record->timelimit;
-            $exam_end_date    = $quiz_record->timeclose; 
+            $course_id        = (int)$quiz->course;
+            $duration         = $quiz->timelimit;
+            $exam_end_date    = $quiz->timeclose;
             $rule_id          = 0;
             $rule_description = null;
             $for_student      = true;
             $for_proctor      = true;
             $display_order    = 0;
             $exam_level_id    = 2;
-            $exam_name        = $quiz_record->name;
-            $exam_start_date  = $quiz_record->timeopen;
+            $exam_name        = $quiz->name;
+            $exam_start_date  = $quiz->timeopen;
             $exam_url         = $CFG->wwwroot.'/mod/quiz/view.php?id='.$moodle_exam_id.'&useexamity=1';
             $status_id        = 1;
-            $allowed_attempts = (int)$quiz_record->attempts;
-            $exam_code        = $quiz_record->name;
-            $exam_password    = $quiz_record->password;
-            $exam_username    = $quiz_record->name;
+            $allowed_attempts = (int)$quiz->attempts;
+            $exam_code        = $quiz->name;
+            $exam_password    = $quiz->password;
+            $exam_username    = $quiz->name;
             $is_student_upload_file = true;
             $userId = null;
             $testtakerUrl = null;
@@ -581,6 +601,11 @@ class helper {
 
         $examity_exam = self::post_api($url, 'update', $postdata, $token);
         $examity_exam = json_decode($examity_exam, true);
+
+
+        $message = get_string('success_update_exam', 'quizaccess_examity');
+        $messagetype = 'success';
+        \core\notification::add($message, $messagetype);
 
         return $examity_exam;
     }
