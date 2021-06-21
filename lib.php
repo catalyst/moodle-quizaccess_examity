@@ -39,8 +39,8 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
         $attributes = array(1 => get_string('enable', 'quizaccess_examity'),
                             0 => get_string('disable', 'quizaccess_examity'));
         $mform->addElement('header', 'examity', 'Examity');
-        $mform->addElement('select', 'examity_enable_disable', get_string('select_field', 'quizaccess_examity'), $attributes);
-        $mform->setDefault('examity_enable_disable', 1);
+        $mform->addElement('select', 'examity_enabled', get_string('select_field', 'quizaccess_examity'), $attributes);
+        $mform->setDefault('examity_enabled', 1);
     }
 }
 
@@ -54,7 +54,7 @@ function quizaccess_examity_coursemodule_validation($mform) {
     $data = $mform->get_submitted_data();
 
     $errors = [];
-    if (!empty($data->examity_enable_disable)) {
+    if (!empty($data->examity_enabled)) {
         // If examity is enabled, we also need some other quiz settings to be enabled.
         $requiredvars = ['quizpassword', 'timeopen', 'timeclose', 'timelimit'];
         foreach ($requiredvars as $req) {

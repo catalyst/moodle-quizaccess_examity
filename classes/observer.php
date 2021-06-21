@@ -44,7 +44,7 @@ class quizaccess_examity_observer {
     public static function update(\core\event\base $event) {
         global $DB, $COURSE, $USER;
 
-        $examityquizenabled = optional_param('examity_enable_disable', 0, PARAM_INT);
+        $examityquizenabled = optional_param('examity_enabled', 0, PARAM_INT);
         $examityenabled = get_config('quizaccess_examity', 'examity_manage');
 
         if (!empty($examityquizenabled) && !empty($examityenabled)) {

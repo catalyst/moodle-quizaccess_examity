@@ -190,12 +190,12 @@ class helper {
     public static function get_examity_token($url, $client_id, $username, $password) {
 
         $validation_data = "{
-            \"client_id\": $client_id->value,
-            \"username\":\"$username->value\",
-            \"password\":\"$password->value\"
+            \"client_id\": $client_id,
+            \"username\":\"$username\",
+            \"password\":\"$password\"
         }";
 
-        $token = self::post_api($url->value .'/auth', 'create', $validation_data);
+        $token = self::post_api($url .'/auth', 'create', $validation_data);
         $examity_token = json_decode($token, true);
 
         if(!isset($examity_token['access_token'])) {
@@ -219,7 +219,7 @@ class helper {
 
         $examity_user = null;
         $examity_user_id = (int)$examity_user_id ?? null;
-        $examity_user = self::post_api($url->value . '/users' . '/' . $examity_user_id, 'read', null, $headers);
+        $examity_user = self::post_api($url . '/users' . '/' . $examity_user_id, 'read', null, $headers);
         $examity_user = json_decode($examity_user_id, true);
 
         if(!isset($examity_user['user_id'])){
@@ -245,7 +245,7 @@ class helper {
         $postdata = null;
         $examity_course = null;
         $examity_course_id = (int)$examity_course_id ?? null;
-        $url = $url->value . '/courses' . '/' . $examity_course_id;
+        $url = $url . '/courses' . '/' . $examity_course_id;
         $examity_course = self::post_api($url, 'read', $postdata, $headers);
         $examity_course = json_decode($examity_course, true);
 
@@ -270,7 +270,7 @@ class helper {
 
         $postdata = null;
         $examity_exam = null;
-        $url = $url->value . '/exams' . '/' . $examity_exam_id;
+        $url = $url . '/exams' . '/' . $examity_exam_id;
         $examity_exam = self::post_api($url, 'read', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
 
@@ -296,7 +296,7 @@ class helper {
         $examity_user = null;
         $country_code = (int)$user->country;
         $timezone_id = (int)$user->timezone;
-        $url = $url->value . '/users';
+        $url = $url . '/users';
 
         $firstname      = $user->firstname;
         $lastname       = $user->lastname;
@@ -345,7 +345,7 @@ class helper {
 
         $examitycourse = null;
         $coursecode = self::get_courseidentifier($course);
-        $url = $url->value . '/courses';
+        $url = $url . '/courses';
         $primary_instructor_id = (int)$examityuserid;
 
         if ($primary_instructor_id) {
@@ -388,7 +388,7 @@ class helper {
         global $DB, $CFG;
         $postdata = null;
         $examity_exam = null;
-        $url = $url->value . '/exams';
+        $url = $url . '/exams';
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
 
         if(isset($quiz_record->id)){
@@ -461,7 +461,7 @@ class helper {
      */
     public static function update_examity_course($url, $examityuserid, $examitycourseid, $course, $headers) {
 
-        $url = $url->value . '/courses' . '/' . (int)$examitycourseid;
+        $url = $url . '/courses' . '/' . (int)$examitycourseid;
         $coursename = $course->fullname;
         $coursecode = self::get_courseidentifier($course);
         $primaryinstructorid = (int)$examityuserid;
@@ -496,7 +496,7 @@ class helper {
     public static function update_examity_exam($url, $moodle_user_id, $moodle_course_id, $moodle_exam_id, $examity_exam_id, $headers) {
         global $DB, $CFG;
         $quiz_record = $DB->get_record('quiz', ['id' => $moodle_exam_id]);
-        $url = $url->value . '/exams' . '/' . (int)$examity_exam_id;
+        $url = $url . '/exams' . '/' . (int)$examity_exam_id;
         $postdata = null;
 
         if(isset($quiz_record->id)){
@@ -612,7 +612,7 @@ class helper {
 
         $examity_course = null;
         $postdata = "";
-        $url = $url->value . '/courses' . '/' . $examity_course_id;
+        $url = $url . '/courses' . '/' . $examity_course_id;
         $examity_course = self::post_api($url, 'delete', $postdata, $headers);
         $examity_course = json_decode($examity_course, true);
         
@@ -631,7 +631,7 @@ class helper {
 
         $examity_exam = null;
         $postdata = "";
-        $url = $url->value . '/exams' . '/' . $examity_exam_id;
+        $url = $url . '/exams' . '/' . $examity_exam_id;
         $examity_exam = self::post_api($url, 'delete', $postdata, $headers);
         $examity_exam = json_decode($examity_exam, true);
 
