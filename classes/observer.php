@@ -58,25 +58,15 @@ class quizaccess_examity_observer {
             $url                   = get_config('quizaccess_examity', 'examity_url');
 
             // Check whether the user, course or exam is already existing in the db.
-            $examityuserid        = $DB->get_record('quizaccess_examity_u', ['userid' => $moodleuserid]);
-
-            if (isset($examityuserid->examity_user_id)) {
-                $examityuserid = (int)$examityuserid->examity_user_id;
-            }
-            $examitycourseid      = $DB->get_record('quizaccess_examity_c', ['course' => $moodlecourseid]);
-            if (isset($examitycourseid->examity_course_id)) {
-                $examitycourseid = (int)$examitycourseid->examity_course_id;
-            }
-            $examityexamid        = $DB->get_record('quizaccess_examity_e', ['quiz' => $moodleexamid]);
-            if (isset($examityexamid->examity_exam_id)) {
-                $examityexamid = (int)$examityexamid->examity_exam_id;
-            }
+            $examityuserid        = $DB->get_field('quizaccess_examity_u', 'examity_user_id', ['userid' => $moodleuserid]);
+            $examitycourseid      = $DB->get_field('quizaccess_examity_c', 'examity_course_id', ['course' => $moodlecourseid]);
+            $examityexamid        = $DB->get_field('quizaccess_examity_e', 'examity_exam_id', ['quiz' => $moodleexamid]);
 
             // Connect to examity auth.
             $examitytoken = helper::get_examity_token($url, $clientid, $consumerusername, $consumerpassword, $moodlecourseid);
 
-            if (isset($examitytoken["access_token"])) {
-                $headers['Authorization'] = ' Bearer '. $examitytoken["access_token"];
+            if (!empty($examitytoken)) {
+                $headers['Authorization'] = ' Bearer '. $examitytoken;
 
                 switch ($event->eventname) {
                     case '\core\event\course_module_created':

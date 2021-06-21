@@ -185,26 +185,27 @@ class helper {
      * @param int $client_id - client id for examity.
      * @param object $username - username for examity auth.
      * @param object $password - password for examity auth.
-     * @return string $examity_token - get auth token from examity.
+     * @return string $extoken - get auth token from examity.
      */
-    public static function get_examity_token($url, $client_id, $username, $password) {
+    public static function get_examity_token($url, $clientid, $username, $password) {
 
-        $validation_data = "{
-            \"client_id\": $client_id,
+        $validationdata = "{
+            \"client_id\": $clientid,
             \"username\":\"$username\",
             \"password\":\"$password\"
         }";
 
-        $token = self::post_api($url .'/auth', 'create', $validation_data);
-        $examity_token = json_decode($token, true);
+        $token = self::post_api($url .'/auth', 'create', $validationdata);
+        $extoken = json_decode($token, true);
 
-        if(!isset($examity_token['access_token'])) {
+        if(!isset($extoken['access_token'])) {
             $message = get_string('error_auth','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
+            return false;
         }
 
-        return $examity_token;
+        return $extoken['access_token'];
     }
 
     /**
