@@ -42,22 +42,20 @@ class quizaccess_examity_observer {
      * @throws dml_exception
      */
     public static function update(\core\event\base $event) {
-        global $DB;
-        global $COURSE;
-        global $USER;
+        global $DB, $COURSE, $USER;
 
         $examityquizenabled = optional_param('examity_enable_disable', 0, PARAM_INT);
-        $examityenabled = get_config('examity_manage', 'quizaccess_examity');
+        $examityenabled = get_config('quizaccess_examity', 'examity_manage');
 
         if (!empty($examityquizenabled) && !empty($examityenabled)) {
             $moodleuserid = (int)$event->get_data()['userid'] ?? null;
             $moodlecourseid = (int)$event->get_data()['courseid'] ?? null;
             $moodleexamid = (int)$event->get_data()['other']['instanceid'] ?? null;
 
-            $consumerusername      = get_config('consumer_username', 'quizaccess_examity');
-            $consumerpassword      = get_config('consumer_password', 'quizaccess_examity');
-            $clientid              = get_config('client_id', 'quizaccess_examity');
-            $url                   = get_config('examity_url', 'quizaccess_examity');
+            $consumerusername      = get_config('quizaccess_examity', 'consumer_username');
+            $consumerpassword      = get_config('quizaccess_examity', 'consumer_password');
+            $clientid              = get_config('quizaccess_examity', 'client_id');
+            $url                   = get_config('quizaccess_examity', 'examity_url');
 
             // Check whether the user, course or exam is already existing in the db.
             $examityuserid        = $DB->get_record('quizaccess_examity_u', ['userid' => $moodleuserid]);
