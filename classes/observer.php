@@ -235,9 +235,15 @@ class quizaccess_examity_observer {
         if (empty($config)) {
             return;
         }
-        $quizid = $event->get_data()['other']['instanceid'] ?? null;
 
-        $examityexamid        = $DB->get_field('quizaccess_examity_e', 'examity_exam_id', ['quiz' => $quizid]);
+        // Check to make sure this is actually a quiz activity, and not another module type.
+        $cmid = $event['contextinstanceid'];
+        $coursemodule = get_coursemodule_from_id('quiz', $cmid);
+        if (empty($coursemodule)) {
+            return;
+        }
+
+        $examityexamid        = $DB->get_field('quizaccess_examity_e', 'examity_exam_id', ['quiz' => $coursemodule->instance]);
         if (empty($examityexamid)) {
             return;
         }
