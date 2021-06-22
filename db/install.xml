@@ -34,41 +34,5 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_examity_u_c" COMMENT="examity users and courses">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="examity_user_id" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="examity_course_id" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="quizaccess_examity_u_e" COMMENT="examity user and exam">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="quiz" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="examity_user_id" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="examity_exam_id" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="quizaccess_examity_c_e" COMMENT="examity courses and exams">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="quiz" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="examity_course_id" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="examity_exam_id" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
   </TABLES>
 </XMLDB>

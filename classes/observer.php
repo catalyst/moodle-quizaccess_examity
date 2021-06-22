@@ -87,51 +87,6 @@ class quizaccess_examity_observer {
             } else {
                 $examityexam = helper::update_examity_exam($config->examity_url, $moodleuserid, $moodlecourseid, $moodleexamid, $examityexamid, $examitytoken);
             }
-
-            switch ($event->eventname) {
-                // TODO - Shift this stuff into a function.
-                case '\core\event\course_module_created':
-                    // Update custom database examity tables in moodle.
-                    if ($examityuserid && $examitycourseid && $examityexamid) {
-
-                        $data = [
-                            'id' => null,
-                            'userid' => $moodleuserid,
-                            'course' => $moodlecourseid,
-                            'examity_user_id' => $examityuserid,
-                            'examity_course_id' => $examitycourseid,
-                        ];
-
-                        $DB->insert_record('quizaccess_examity_u_c', $data);
-
-                        $data = [
-                            'id' => null,
-                            'userid' => $moodleuserid,
-                            'quiz' => $moodleexamid,
-                            'examity_user_id' => $examityuserid,
-                            'examity_exam_id' => $examityexamid,
-                        ];
-
-                        $DB->insert_record('quizaccess_examity_u_e', $data);
-
-                        // $examityuser   = helper::get_examity_user($config->examity_url, $examityuserid, $examitytoken);
-                        // $examitycourse = helper::get_examity_course($config->examity_url, $examitycourseid, $examitytoken);
-                        // $examityexam   = helper::get_examity_exam($config->examity_url, $examityexamid, $examitytoken);
-
-                        $data = [
-                            'id' => null,
-                            'course' => $moodlecourseid,
-                            'quiz' => $moodleexamid,
-                            'examity_course_id' => $examitycourseid,
-                            'examity_exam_id' => $examityexamid,
-                        ];
-
-                        $DB->insert_record('quizaccess_examity_c_e', $data);
-                    }
-
-                    break;
-                }
-
         }
     }
 
@@ -192,8 +147,6 @@ class quizaccess_examity_observer {
                 $examityexamid = $examityexam['exam_id'];
                 helper::delete_examity_exam($config->url, $examityexamid, $examitytoken);
                 $DB->delete_records('quizaccess_examity_e', ['examity_exam_id' => $examityexamid]);
-                $DB->delete_records('quizaccess_examity_u_e', ['examity_exam_id' => $examityexamid]);
-                $DB->delete_records('quizaccess_examity_c_e', ['examity_exam_id' => $examityexamid]);
                 $message = get_string('success_delete_exam', 'quizaccess_examity');
                 $messagetype = 'success';
                 \core\notification::add($message, $messagetype);
