@@ -768,8 +768,8 @@ class helper {
      */
     public static function get_config() {
         $config = get_config('quizaccess_examity');
-        if (!empty($config->examity_manage) && !empty($config->examity_url) && !empty($config->client_username)
-            && !empty($config->client_password)) {
+        if (!empty($config->examity_manage) && !empty($config->apiurl) && !empty($config->username)
+            && !empty($config->password)) {
             return $config;
         }
         return false;

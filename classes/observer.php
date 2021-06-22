@@ -63,7 +63,7 @@ class quizaccess_examity_observer {
             $examityexamid        = $DB->get_field('quizaccess_examity_e', 'examity_exam_id', ['quiz' => $moodleexamid]);
 
             // Connect to examity auth.
-            $examitytoken = helper::get_examity_token($config->examity_url, $config->client_id, $config->consumer_username, $config->consumer_password, $moodlecourseid);
+            $examitytoken = helper::get_examity_token($config->apiurl, $config->client_id, $config->username, $config->password, $moodlecourseid);
             if (empty($examitytoken)) {
                 $message = get_string('error_auth', 'quizaccess_examity');
                 \core\notification::add($message, 'error');
@@ -72,22 +72,22 @@ class quizaccess_examity_observer {
 
             // First create user if we have not created one before.
             if (!$examityuserid) {
-                $examityuserid = helper::create_examity_user($config->examity_url, $USER, $examitytoken);
+                $examityuserid = helper::create_examity_user($config->apiurl, $USER, $examitytoken);
             }
             if (!empty($examityuserid)) {
                 // Only do this stuff if we have a user to work with.
 
                 if (!$examitycourseid) {
                     // Create a course in examity if we have not created one before.
-                    helper::create_examity_course($config->examity_url, $examityuserid, $COURSE, $examitytoken);
+                    helper::create_examity_course($config->apiurl, $examityuserid, $COURSE, $examitytoken);
                 } else {
-                    helper::update_examity_course($config->examity_url, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
+                    helper::update_examity_course($config->apiurl, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
                 }
 
                 if (!$examityexamid) {
-                    helper::create_examity_exam($config->examity_url, $moodleuserid, $examitycourseid, $moodleexamid, $examitytoken);
+                    helper::create_examity_exam($config->apiurl, $moodleuserid, $examitycourseid, $moodleexamid, $examitytoken);
                 } else {
-                    helper::update_examity_exam($config->examity_url, $moodleuserid, $moodlecourseid, $moodleexamid, $examityexamid, $examitytoken);
+                    helper::update_examity_exam($config->apiurl, $moodleuserid, $moodlecourseid, $moodleexamid, $examityexamid, $examitytoken);
                 }
             }
         }
@@ -121,27 +121,27 @@ class quizaccess_examity_observer {
             return;
         }
 
-        $examitytoken = helper::get_examity_token($config->examity_url, $config->client_id, $config->consumer_username, $config->consumer_password);
+        $examitytoken = helper::get_examity_token($config->apiurl, $config->client_id, $config->username, $config->password);
         // delete course
         //
         // $exams = helper::select('examity_course_exam', 'examity_course_id', $examitycourseid);
         // foreach($exams as $exam) {
         //     // Delete exams associated to a couse from examity
-        //     $delete_examity_exam = helper::delete_examity_exam($config->examity_url, $exam->examity_exam_id, $examitytoken);
+        //     $delete_examity_exam = helper::delete_examity_exam($config->apiurl, $exam->examity_exam_id, $examitytoken);
         //     // Delete exams associated to a couse from moodle custom database
         //     $delete_examity_exam = helper::delete('examity_exam', 'examity_exam_id', $exam->examity_exam_id);
         //     $delete_examity_user_exam = helper::delete('examity_user_exam', 'examity_exam_id', $exam->examity_exam_id);
         //     $delete_examity_course_exam = helper::delete('examity_course_exam', 'examity_exam_id', $exam->examity_exam_id);
         // }
         // // Delete course record from examity after deleting the exams
-        // $delete_examity_course = helper::delete_examity_course($config->examity_url, $examitycourseid, $examitytoken);
+        // $delete_examity_course = helper::delete_examity_course($config->apiurl, $examitycourseid, $examitytoken);
         // // Delete course record from moodle custom database
         // $delete_examity_course = helper::delete('examity_course', 'examity_course_id', $examitycourseid);
         // $delete_examity_user_course = helper::delete('examity_user_course', 'examity_course_id', $examitycourseid);
         // $delete_examity_course_exam = helper::delete('examity_course_exam', 'examity_course_id', $examitycourseid);
         // // Delete course record from examity after deleting the exams
-        // $delete_examity_course = helper::delete_examity_course($config->examity_url, $examitycourseid, $examitytoken);
-        // $delete_examity_exam = helper::delete_examity_exam($config->examity_url, $examityexamid, $examitytoken);
+        // $delete_examity_course = helper::delete_examity_course($config->apiurl, $examitycourseid, $examitytoken);
+        // $delete_examity_exam = helper::delete_examity_exam($config->apiurl, $examityexamid, $examitytoken);
 
         if ($examityexamid) {
             $examityexam = helper::get_examity_exam($config->url, $examityexamid, $examitytoken);
