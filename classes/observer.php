@@ -70,22 +70,25 @@ class quizaccess_examity_observer {
                 return null;
             }
 
-            // First Create user if we have not created one before.
+            // First create user if we have not created one before.
             if (!$examityuserid) {
-                helper::create_examity_user($config->examity_url, $USER, $examitytoken);
+                $examityuserid = helper::create_examity_user($config->examity_url, $USER, $examitytoken);
             }
+            if (!empty($examityuserid)) {
+                // Only do this stuff if we have a user to work with.
 
-            // Create a course in examity if we have not created one before.
-            if (!$examitycourseid) {
-                helper::create_examity_course($config->examity_url, $examityuserid, $COURSE, $examitytoken);
-            } else {
-                helper::update_examity_course($config->examity_url, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
-            }
+                if (!$examitycourseid) {
+                    // Create a course in examity if we have not created one before.
+                    helper::create_examity_course($config->examity_url, $examityuserid, $COURSE, $examitytoken);
+                } else {
+                    helper::update_examity_course($config->examity_url, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
+                }
 
-            if (!$examityexamid) {
-                helper::create_examity_exam($config->examity_url, $moodleuserid, $examitycourseid, $moodleexamid, $examitytoken);
-            } else {
-                helper::update_examity_exam($config->examity_url, $moodleuserid, $moodlecourseid, $moodleexamid, $examityexamid, $examitytoken);
+                if (!$examityexamid) {
+                    helper::create_examity_exam($config->examity_url, $moodleuserid, $examitycourseid, $moodleexamid, $examitytoken);
+                } else {
+                    helper::update_examity_exam($config->examity_url, $moodleuserid, $moodlecourseid, $moodleexamid, $examityexamid, $examitytoken);
+                }
             }
         }
     }

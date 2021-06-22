@@ -288,24 +288,32 @@ class helper {
      * @param object $url - url for the curl request.
      * @param object $user - moodle user details.
      * @param array $token examity token.
-     * @return string $examity_user - user details created in examity.
+     * @return boolean - user created in examity.
      */
     public static function create_examity_user($url, $user, $token) {
         global $DB;
 
         $country_code = (int)$user->country;
         $timezone_id = (int)$user->timezone;
-        $url = $url . '/users';
-
         $firstname      = $user->firstname;
         $lastname       = $user->lastname;
         $email          = $user->email;
         $picture        = $user->picture;
         $phone2         = $user->phone2;
-        $country        = $user->country;
-        $timezone       = $user->timezone;
 
-        $postdata = "{
+        $url = $url . '/users';
+
+        // First check to see if this user already exists.
+        $postdata = ['filter_query' => '{"field":"email", "op":"eq", "value":"'.$email.'"}'];
+        $request = self::post_api($url, 'read', $postdata, $token);
+        $response = json_decode($request, true);
+        if (isset($response['content'][0]['username']) && isset($response['content'][0]['user_id']) &&
+            $response['content'][0]['username'] == $email) {
+
+            $examityuserid = $response['content'][0]['user_id'];
+        } else {
+            // Couldn't find this user, create it.
+            $postdata = "{
                         \"first_name\":\"$firstname\",
                         \"last_name\":\"$lastname\",
                         \"email\":\"$email\",
@@ -317,24 +325,29 @@ class helper {
                         \"metadata\":{},
                         \"username\":\"$email\",
                         \"send_password_reset_email\":true
-        }";
+            }";
 
-        $examityuser = self::post_api($url, 'create', $postdata, $token);
-        $examityuser = json_decode($examityuser, true);
+            $request = self::post_api($url, 'create', $postdata, $token);
+            $response = json_decode($request, true);
+            if (isset($response['user_id'])) {
+                $examityuserid = $response['user_id'];
+            }
+        }
 
-        if(!isset($examity_user['user_id'])){
+        if (!isset($examityuserid)) {
             $message = get_string('error_create_user','quizaccess_examity');
             $messagetype = 'error';
             \core\notification::add($message, $messagetype);
+            return false;
         } else {
             $data = [
-                    'id' => null,
-                    'userid' => $user->id,
-                    'examity_user_id' => $examityuser['user_id']
-                    ];
+                'id' => null,
+                'userid' => $user->id,
+                'examity_user_id' => $examityuserid
+            ];
 
             $DB->insert_record('quizaccess_examity_u', $data);
-            return $examity_user;
+            return $examityuserid;
         }
     }
 
@@ -744,7 +757,7 @@ class helper {
     public static function get_courseidentifier($course) {
         global $CFG;
         // We use the first 6 chars of the siteidentifier to prevent issues when the same examity account is used on multiple sites.
-        return (substr($CFG->siteindentifier, 0, 6)."_".$course->id."_".$course->shortname);
+        return (substr($CFG->siteidentifier, 0, 6)."_".$course->id."_".$course->shortname);
     }
 
     /**
