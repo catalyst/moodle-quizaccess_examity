@@ -66,3 +66,4 @@ $string['timelimit_required'] = 'Examity requires a quiz time limit to be set.';
 $string['disable'] = 'Disable';
 $string['enable'] = 'Enable';
 $string['logintoexamity'] = 'Click here to login into Examity';
+$string['web_services'] = 'Examity web services';

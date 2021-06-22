@@ -24,15 +24,13 @@
  */
 
 require_once(dirname(__FILE__) . "/../../../../config.php");
-require_once('defaults_form.php');
-
 require_login();
 
 $context = context_system::instance();
 $PAGE->set_url($CFG->wwwroot.'/mod/quiz/accessrule/examity_default.php');
 $PAGE->set_context($context);
-$PAGE->set_title(get_string('examity_web_services', 'quizaccess_examity'));
-$PAGE->set_heading(get_string('onesystemcontrolling', 'webservice'));
+$PAGE->set_title($SITE->fullname);
+$PAGE->set_heading($SITE->fullname);
 $PAGE->navbar->add(get_string('examity_web_services', 'quizaccess_examity'));
 
 

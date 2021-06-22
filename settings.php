@@ -62,7 +62,7 @@ if ($hassiteconfig) {
         'root',
         new admin_externalpage(
             'local_custom_links',
-            'Examity web services',
+            get_string('web_services', 'quizaccess_examity'),
             new moodle_url('/mod/quiz/accessrule/examity/examity_default.php'),
            'moodle/site:config'
        )
