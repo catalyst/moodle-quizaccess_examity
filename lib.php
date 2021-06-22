@@ -36,10 +36,11 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
     $modulename = $formwrapper->get_current()->modulename;
 
     if ($modulename == 'quiz') {
-        $attributes = array(1 => get_string('enable', 'quizaccess_examity'),
-                            0 => get_string('disable', 'quizaccess_examity'));
+        $attributes = array(0 => get_string('disable', 'quizaccess_examity'),
+                            1 => get_string('enable', 'quizaccess_examity'));
         $mform->addElement('header', 'examity', 'Examity');
         $mform->addElement('select', 'examity_enabled', get_string('select_field', 'quizaccess_examity'), $attributes);
+
         $mform->setDefault('examity_enabled', 1);
     }
 }
