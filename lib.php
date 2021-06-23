@@ -48,7 +48,7 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
 /**
  * Validate the data in the new field when the form is submitted.
  *
- * @param object $data
+ * @param object $mform
  * @return array $errors
  */
 function quizaccess_examity_coursemodule_validation($mform) {

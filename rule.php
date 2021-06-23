@@ -56,7 +56,7 @@ class quizaccess_examity extends quiz_access_rule_base {
 
     /**
      * Whether or not a user should be allowed to start a new attempt at this quiz now.
-     * @param int $numattempts the number of previous attempts this user has made.
+     * @param int $numprevattempts the number of previous attempts this user has made.
      * @param object $lastattempt information about the user's last completed attempt.
      * @return string false if access should be allowed, a message explaining the
      *      reason if access should be prevented.
@@ -87,3 +87,4 @@ class quizaccess_examity extends quiz_access_rule_base {
     }
 
 }
+

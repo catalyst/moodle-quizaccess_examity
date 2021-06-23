@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use quizaccess_examity\helper;
 
+/**
+ * Create custom examity role and assign capablities.
+ */
 function xmldb_quizaccess_examity_install() {
 
     helper::get_examity_role();
