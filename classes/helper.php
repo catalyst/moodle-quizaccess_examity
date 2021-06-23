@@ -637,42 +637,131 @@ class helper
     /**
      * Examity single sign on.
      *
-     * @param string $moodlecourseid moodle course id.
-     * @param string $moodleexamid   examity exam id.
-     * @return object $lti           data send to create single sign on link.
+     * @param string $courseid moodle course id.
+     * @param string $cmid examity exam id.
+     * @return object $lti - data send to create single sign on link.
      */
-    public static function examity_sso($moodlecourseid, $moodleexamid) {
+    public static function examity_sso($courseid, $cmid) {
 
-                $lti = new stdClass();
-                $lti->id = 3;
-                $lti->course = $moodlecourseid;
-                $lti->name = 'examity_sso';
-                $lti->intro = '';
-                $lti->introformat = '1';
-                $lti->timecreated = '';
-                $lti->timemodified = '';
-                $lti->typeid = '1';
-                $lti->toolurl = '';
-                $lti->securetoolurl = '';
-                $lti->instructorchoicesendname = '1';
-                $lti->instructorchoicesendemailaddr = '1';
-                $lti->instructorchoiceallowroster = null;
-                $lti->instructorchoiceallowsetting = null;
-                $lti->instructorcustomparameters = "";
-                $lti->instructorchoiceacceptgrades = "1";
-                $lti->grade = "";
-                $lti->launchcontainer = "1";
-                $lti->resourcekey = "";
-                $lti->password = "";
-                $lti->debuglaunch = "0";
-                $lti->showtitlelaunch = "1";
-                $lti->servicesalt = "";
-                $lti->icon = "";
-                $lti->secureicon = "";
-                $lti->cmid = $moodleexamid;
+        // Create a sso link for this quiz.
+        $lti = new stdClass();
+        $lti->id = null;
+        $lti->resourcekey = get_config('quizaccess_examity', 'providerkey');
+        $lti->password = get_config('quizaccess_examity', 'providersecret');
+        $lti->toolurl = get_config('quizaccess_examity', 'ltiurl');
+        $lti->intro = '';
+        $lti->introformat = 1;
+        $lti->cmid = $cmid;
+        $lti->course = $courseid;
+        $lti->name = 'examity_sso';
+        $lti->typeid = '1';
+        $lti->instructorchoicesendname = 1;
+        $lti->instructorchoicesendemailaddr = 1;
+        $lti->instructorchoiceallowroster = 0;
+        $lti->instructorchoiceallowsetting = 0;
+        $lti->instructorchoiceacceptgrades = 1;
+        $lti->launchcontainer = 1;
+        $lti->debuglaunch = 0;
+        $lti->showtitlelaunch = 1;
+        $lti->sendname = LTI_SETTING_ALWAYS;
+        $lti->sendemailaddr = LTI_SETTING_ALWAYS;
+        $lti->acceptgrades = LTI_SETTING_NEVER;
+        $lti->allowroster = LTI_SETTING_NEVER;
 
-                return $lti;
+        return $lti;
     }
+
+    /**
+     * Modified version of lti_get_launch_data from mod_lti.
+     *
+     * @param  stdClass $instance the external tool activity settings
+     * @return array the endpoint URL and parameters (including the signature)
+     * @since  Moodle 3.0
+     */
+    public static function lti_get_launch_data($instance) {
+        global $PAGE, $USER;
+
+        $typeid = null;
+        $ltiversion = LTI_VERSION_1;
+
+        $typeconfig = (array)$instance;
+
+        $toolproxy = null;
+        $key = $instance->resourcekey;
+        $secret = $instance->password;
+
+        $endpoint = $instance->toolurl;
+        $endpoint = trim($endpoint);
+
+        // If the current request is using SSL and a secure tool URL is specified, use it.
+        if (lti_request_is_using_ssl() && !empty($instance->securetoolurl)) {
+            $endpoint = trim($instance->securetoolurl);
+        }
+
+        $orgid = lti_get_organizationid($typeconfig);
+
+        $course = $PAGE->course;
+
+        $allparams = lti_build_request($instance, $typeconfig, $course, $typeid);
+        $requestparams = $allparams;
+
+        $requestparams = array_merge($requestparams, lti_build_standard_message($instance, $orgid, $ltiversion));
+
+        // Always load in current window.
+        $launchcontainer = LTI_LAUNCH_CONTAINER_REPLACE_MOODLE_WINDOW;
+        $target = 'frame';
+        $requestparams['launch_presentation_document_target'] = $target;
+
+        $returnurlparams = array('course' => $course->id,
+            'launch_container' => $launchcontainer,
+            'id' => $instance->cmid);
+
+        // Add the return URL. We send the launch container along to help us avoid frames-within-frames when the user returns.
+        $url = new \moodle_url('/mod/quiz/view.php', $returnurlparams);
+        $returnurl = $url->out(false);
+
+        $requestparams['launch_presentation_return_url'] = $returnurl;
+
+        // Add the parameters configured by the LTI services.
+        if ($typeid) {
+            $services = lti_get_services();
+            foreach ($services as $service) {
+                $serviceparameters = $service->get_launch_parameters('basic-lti-launch-request',
+                    $course->id, $USER->id , $typeid, $instance->id);
+                foreach ($serviceparameters as $paramkey => $paramvalue) {
+                    $requestparams['custom_' . $paramkey] = lti_parse_custom_parameter($toolproxy,
+                                                            null,
+                                                            $requestparams,
+                                                            $paramvalue,
+                                                            false);
+                }
+            }
+        }
+
+        if ((!empty($key) && !empty($secret))) {
+            $parms = lti_sign_parameters($requestparams, $endpoint, 'POST', $key, $secret);
+
+            $endpointurl = new \moodle_url($endpoint);
+            $endpointparams = $endpointurl->params();
+
+            // Strip querystring params in endpoint url from $parms to avoid duplication.
+            if (!empty($endpointparams) && !empty($parms)) {
+                foreach (array_keys($endpointparams) as $paramname) {
+                    if (isset($parms[$paramname])) {
+                        unset($parms[$paramname]);
+                    }
+                }
+            }
+
+        } else {
+            // If no key and secret, do the launch unsigned.
+            $returnurlparams['unsigned'] = '1';
+            $parms = $requestparams;
+        }
+
+        return array($endpoint, $parms);
+    }
+
 
     /**
      * Create custom examity role and assign capablities.
@@ -725,8 +814,8 @@ class helper
      */
     public static function get_config() {
         $config = get_config('quizaccess_examity');
-        if (!empty($config->examity_manage) && !empty($config->examity_url) && !empty($config->client_username)
-            && !empty($config->client_password)) {
+        if (!empty($config->examity_manage) && !empty($config->apiurl) && !empty($config->username)
+            && !empty($config->password)) {
             return $config;
         }
         return false;

@@ -37,6 +37,8 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 require_login($course, true, $cm);
 
 $lti = helper::examity_sso($course->id, $cm->id);
-lti_launch_tool($lti);
 
+list($endpoint, $parms) = helper::lti_get_launch_data($lti);
+$content = lti_post_launch_html($parms, $endpoint);
 
+echo $content;

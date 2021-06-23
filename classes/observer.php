@@ -63,10 +63,10 @@ class quizaccess_examity_observer {
             $examityexamid        = $DB->get_field('quizaccess_examity_e', 'examity_exam_id', ['quiz' => $moodleexamid]);
 
             // Connect to examity auth.
-            $examitytoken = helper::get_examity_token($config->examity_url,
+            $examitytoken = helper::get_examity_token($config->apiurl,
                                                       $config->client_id,
-                                                      $config->consumer_username,
-                                                      $config->consumer_password,
+                                                      $config->username,
+                                                      $config->password,
                                                       $moodlecourseid);
             if (empty($examitytoken)) {
                 $message = get_string('error_auth', 'quizaccess_examity');
@@ -76,26 +76,22 @@ class quizaccess_examity_observer {
 
             // First create user if we have not created one before.
             if (!$examityuserid) {
-                $examityuserid = helper::create_examity_user($config->examity_url, $USER, $examitytoken);
+                $examityuserid = helper::create_examity_user($config->apiurl, $USER, $examitytoken);
             }
             if (!empty($examityuserid)) {
                 // Only do this stuff if we have a user to work with.
 
                 if (!$examitycourseid) {
                     // Create a course in examity if we have not created one before.
-                    helper::create_examity_course($config->examity_url, $examityuserid, $COURSE, $examitytoken);
+                    helper::create_examity_course($config->apiurl, $examityuserid, $COURSE, $examitytoken);
                 } else {
-                    helper::update_examity_course($config->examity_url, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
+                    helper::update_examity_course($config->apiurl, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
                 }
 
                 if (!$examityexamid) {
-                    helper::create_examity_exam($config->examity_url,
-                                                $moodleuserid,
-                                                $examitycourseid,
-                                                $moodleexamid,
-                                                $examitytoken);
+                    helper::create_examity_exam($config->apiurl, $moodleuserid, $examitycourseid, $moodleexamid, $examitytoken);
                 } else {
-                    helper::update_examity_exam($config->examity_url,
+                    helper::update_examity_exam($config->apiurl,
                                                 $moodleuserid,
                                                 $moodlecourseid,
                                                 $moodleexamid,
@@ -134,10 +130,7 @@ class quizaccess_examity_observer {
             return;
         }
 
-        $examitytoken = helper::get_examity_token($config->examity_url,
-                                                  $config->client_id,
-                                                  $config->consumer_username,
-                                                  $config->consumer_password);
+        $examitytoken = helper::get_examity_token($config->apiurl, $config->client_id, $config->username, $config->password);
 
         if ($examityexamid) {
             $examityexam = helper::get_examity_exam($config->url, $examityexamid, $examitytoken);

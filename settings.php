@@ -33,29 +33,33 @@ if ($hassiteconfig) {
         $settings->add(new admin_setting_configcheckbox('quizaccess_examity/examity_manage',
         get_string('manage', 'quizaccess_examity'), get_string('manage_help', 'quizaccess_examity'), 1));
 
-        $settings->add(new admin_setting_configtext('quizaccess_examity/consumer_username',
-        get_string('consumer_username', 'quizaccess_examity'),
-        get_string('consumer_username_help', 'quizaccess_examity'), '', PARAM_EMAIL, 30));
+        $settings->add(new admin_setting_configtext('quizaccess_examity/username',
+        get_string('username', 'quizaccess_examity'),
+        get_string('username_help', 'quizaccess_examity'), '', PARAM_EMAIL, 30));
 
-        $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/consumer_password',
-        get_string('consumer_password', 'quizaccess_examity'),
-        get_string('consumer_password_help', 'quizaccess_examity'), '', PARAM_INT));
-
-        $settings->add(new admin_setting_configtext('quizaccess_examity/client_username',
-        get_string('client_username', 'quizaccess_examity'),
-        get_string('client_username_help', 'quizaccess_examity'), '', PARAM_EMAIL, 30));
-
-        $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/client_password',
-        get_string('client_password', 'quizaccess_examity'),
-        get_string('client_password_help', 'quizaccess_examity'), '', PARAM_INT));
+        $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/password',
+        get_string('password', 'quizaccess_examity'),
+        get_string('password_help', 'quizaccess_examity'), '', PARAM_INT));
 
         $settings->add(new admin_setting_configtext('quizaccess_examity/client_id',
         get_string('client_id', 'quizaccess_examity'),
         get_string('client_id_help', 'quizaccess_examity'), '', PARAM_INT, 30));
 
-        $settings->add(new admin_setting_configtext('quizaccess_examity/examity_url',
-        get_string('examity_url', 'quizaccess_examity'),
-        get_string('examity_url_help', 'quizaccess_examity'), '', PARAM_TEXT, 30));
+        $settings->add(new admin_setting_configtext('quizaccess_examity/apiurl',
+        get_string('apiurl', 'quizaccess_examity'),
+        get_string('apiurl_help', 'quizaccess_examity'), '', PARAM_URL));
+
+        $settings->add(new admin_setting_configtext('quizaccess_examity/providerkey',
+            get_string('providerkey', 'quizaccess_examity'),
+            get_string('providerkey_help', 'quizaccess_examity'), '', PARAM_TEXT));
+
+        $settings->add(new admin_setting_configpasswordunmask('quizaccess_examity/providersecret',
+            get_string('providersecret', 'quizaccess_examity'),
+            get_string('providersecret_help', 'quizaccess_examity'), '', PARAM_INT));
+
+        $settings->add(new admin_setting_configtext('quizaccess_examity/ltiurl',
+            get_string('ltiurl', 'quizaccess_examity'),
+            get_string('ltiurl_help', 'quizaccess_examity'), '', PARAM_URL));
     }
 
     $ADMIN->add(
