@@ -24,6 +24,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+use quizaccess_examity\helper;
 
 /**
  * Add ability for the teacher to enable examity within a quiz
@@ -34,14 +35,23 @@ defined('MOODLE_INTERNAL') || die();
  */
 function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform) {
     $modulename = $formwrapper->get_current()->modulename;
+    $config = get_config('quizaccess_examity');
 
-    if ($modulename == 'quiz') {
+    // If examity is enabled then show an enable / disable dropdown in quiz form.
+    $examityenabled = $config->examity_manage;
+    $defaultstate = $config->defaultstate;
+
+    if ($modulename == 'quiz' && $examityenabled == '1') {
         $attributes = array(0 => get_string('disable', 'quizaccess_examity'),
                             1 => get_string('enable', 'quizaccess_examity'));
         $mform->addElement('header', 'examity', 'Examity');
         $mform->addElement('select', 'examity_enabled', get_string('select_field', 'quizaccess_examity'), $attributes);
 
-        $mform->setDefault('examity_enabled', 1);
+        if ($defaultstate == '0') {
+            $mform->setDefault('examity_enabled', 1);
+        } else {
+            $mform->setDefault('examity_enabled', 0);
+        }
     }
 }
 

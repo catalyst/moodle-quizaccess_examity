@@ -60,6 +60,10 @@ if ($hassiteconfig) {
         $settings->add(new admin_setting_configtext('quizaccess_examity/ltiurl',
             get_string('ltiurl', 'quizaccess_examity'),
             get_string('ltiurl_help', 'quizaccess_examity'), '', PARAM_URL));
+
+        $settings->add(new admin_setting_configselect('quizaccess_examity/defaultstate',
+            get_string('defaultstate', 'quizaccess_examity'),
+            get_string('defaultstatehelp', 'quizaccess_examity'), '', ['Enabled' , 'Disabled']));
     }
 
     $ADMIN->add(
