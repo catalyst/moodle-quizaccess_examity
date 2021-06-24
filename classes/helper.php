@@ -69,11 +69,13 @@ class helper
     public static function post_api($url,
                                     $crud = null,
                                     $postdata = null,
-                                    $token = null,
-                                    $fullresponse = false,
-                                    $timeout = 300,
-                                    $connecttimeout = 20,
-                                    $skipcertverify = false) {
+                                    $token = null) {
+
+        $fullresponse = false;
+        $timeout = 300;
+        $connecttimeout = 20;
+        $skipcertverify = false;
+
         $options = array();
         $headers['Authorization'] = ' Bearer '. $token;
         if (!preg_match('|^https?://|i', $url)) {
@@ -410,13 +412,12 @@ class helper
      * Create examity exam based on moodle_user_id and moodle_course_id.
      *
      * @param object $url                 url for the curl request.
-     * @param int    $moodleuserid        moodle user.
      * @param int    $examitycourseid     moodle course.
      * @param int    $moodleexamid        moodle exam.
      * @param array  $token               set token in header.
-     * @return string $token
+     * @return string $examityexam
      */
-    public static function create_examity_exam($url, $moodleuserid, $examitycourseid, $moodleexamid, $token) {
+    public static function create_examity_exam($url, $examitycourseid, $moodleexamid, $token) {
         global $DB, $CFG;
         $postdata = null;
         $url = $url . '/exams';
@@ -529,14 +530,12 @@ class helper
      * Update examity exam.
      *
      * @param object $url              url for the curl request.
-     * @param int    $moodleuserid     moodle user id.
-     * @param int    $moodlecourseid   moodle course id.
      * @param int    $moodleexamid     moodle course id.
      * @param int    $examityexamid    examity exam.
      * @param array  $token            set token in header.
      * @return string $examityexam     examity exam data.
      */
-    public static function update_examity_exam($url, $moodleuserid, $moodlecourseid, $moodleexamid, $examityexamid, $token) {
+    public static function update_examity_exam($url, $moodleexamid, $examityexamid, $token) {
         global $DB, $CFG;
         $quiz = $DB->get_record('quiz', ['id' => $moodleexamid]);
         $url = $url . '/exams' . '/' . (int)$examityexamid;

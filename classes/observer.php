@@ -89,11 +89,9 @@ class quizaccess_examity_observer {
                 }
 
                 if (!$examityexamid) {
-                    helper::create_examity_exam($config->apiurl, $moodleuserid, $examitycourseid, $moodleexamid, $examitytoken);
+                    helper::create_examity_exam($config->apiurl, $examitycourseid, $moodleexamid, $examitytoken);
                 } else {
                     helper::update_examity_exam($config->apiurl,
-                                                $moodleuserid,
-                                                $moodlecourseid,
                                                 $moodleexamid,
                                                 $examityexamid,
                                                 $examitytoken);
