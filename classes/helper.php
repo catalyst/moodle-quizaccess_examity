@@ -60,10 +60,6 @@ class helper
      * @param string  $crud           read, write, update, delete in examity.
      * @param string  $postdata       data to post to examity.
      * @param string  $token         token details sent here.
-     * @param boolean $fullresponse   response from api.
-     * @param int     $timeout
-     * @param int     $connecttimeout
-     * @param boolean $skipcertverify
      * @return object
      */
     public static function post_api($url,

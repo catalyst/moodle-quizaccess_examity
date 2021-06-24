@@ -83,7 +83,7 @@ class provider implements
      * @param  int      $userid    The user to delete
      * @param  \context $context   The context to refine the deletion.
      */
-    public static function delete_examity_for_user(int $userid) {
+    public static function delete_examity_for_user(int $userid, $context) {
 
     }
 
@@ -99,7 +99,7 @@ class provider implements
     /**
      * Delete multiple users within a single context.
      *
-     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     * @param   approved_userlist $userlist  The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
 
