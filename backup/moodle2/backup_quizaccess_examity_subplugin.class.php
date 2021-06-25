@@ -43,16 +43,19 @@ class backup_quizaccess_examity_subplugin extends backup_mod_quiz_access_subplug
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
-        $subplugintablesettings = new backup_nested_element('quizaccess_examity_e',
-                null, array('id', 'quiz', 'examity_exam_id'));
-
-        // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);
-        $subpluginwrapper->add_child($subplugintablesettings);
 
-        // Set source to populate the data.
-        $subplugintablesettings->set_source_table('quizaccess_examity_e',
-        array('quizid' => backup::VAR_ACTIVITYID));
+        $examitycourses = new backup_nested_element('examity_courses');
+        $examitycourse = new backup_nested_element('examity_course', array('id'), array('course', 'examity_course_id'));
+        $subpluginwrapper->add_child($examitycourses);
+        $examitycourses->add_child($examitycourse);
+        $examitycourse->set_source_table('quizaccess_examity_c', array('course' => backup::VAR_COURSEID));
+
+        $examityquizes = new backup_nested_element('examity_quizes');
+        $examityquiz = new backup_nested_element('examity_quiz', array('id'), array('quiz', 'examity_quiz_id'));
+        $subpluginwrapper->add_child($examityquizes);
+        $examityquizes->add_child($examityquiz);
+        $examityquiz->set_source_table('quizaccess_examity_q', array('quizid' => backup::VAR_ACTIVITYID));
 
         return $subplugin;
     }
