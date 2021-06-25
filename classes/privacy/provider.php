@@ -64,6 +64,14 @@ class provider implements
      */
     public static function get_contexts_for_userid($userid) : contextlist {
 
+        global $DB;
+        $examityuserid = $DB->get_field('quizaccess_examity_u', 'examity_user_id', ['userid' => $userid]);
+        $contextlist = new contextlist();
+
+        if ($examityuserid) {
+            $contextlist->add_system_context();
+        }
+        return $contextlist;
     }
     /**
      * Export all examity data for the specified userid and context.
@@ -75,6 +83,10 @@ class provider implements
      */
     public static function export_examity_user_data(int $userid, \context $context, array $subcontext, array $linkarray) {
 
+        global $DB;
+        $examityuserid = $DB->get_field('quizaccess_examity_u', 'examity_user_id', ['userid' => $userid]);
+        $finaldata = (object) ['quizaccess_examity' => ['examityuserid' => $examityuserid]];
+        writer::with_context($context)->export_data([], $finaldata);
     }
 
     /**
@@ -85,6 +97,14 @@ class provider implements
      */
     public static function delete_examity_for_user(int $userid, $context) {
 
+        global $DB;
+        if (!$context instanceof \context_system) {
+            return;
+        }
+
+        // Delete all records in quizaccess_examity_u table for that user.
+        $DB->delete_records('quizaccess_examity_u', ['userid' => $userid]);
+
     }
 
     /**
@@ -93,6 +113,26 @@ class provider implements
      * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
+
+        global $DB;
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+
+        foreach ($userids as $userid) {
+
+            $sql = "SELECT userid
+            FROM {quizaccess_examity_u}
+            WHERE userid = :userid";
+
+            $params = ['userid' => $userid];
+            $userlist->add_from_sql('userid', $sql, $params);
+
+        }
 
     }
 
@@ -103,5 +143,17 @@ class provider implements
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
 
+        global $DB;
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+
+        foreach ($userids as $userid) {
+            $DB->delete_records('quizaccess_examity_u', ['userid' => $userid]);
+        }
     }
 }
