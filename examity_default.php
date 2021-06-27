@@ -66,38 +66,53 @@ $table->data[] = $row;
 // Enable protocols.
 $row = array();
 $url = new moodle_url("/admin/settings.php?section=webserviceprotocols");
-$row[0] = "2. " . html_writer::tag('a', get_string('enableprotocols', 'webservice'),
+$row[0] = "2. " . html_writer::tag('a', get_string('enablerest', 'quizaccess_examity'),
                 array('href' => $url));
 $status = html_writer::tag('span', get_string('none'), array('class' => 'badge badge-danger'));
 // Retrieve activated protocol.
 $activeprotocols = empty($CFG->webserviceprotocols) ?
         array() : explode(',', $CFG->webserviceprotocols);
 if (!empty($activeprotocols)) {
-    $status = "";
     foreach ($activeprotocols as $protocol) {
-        $status .= $protocol . $brtag;
+        if ($protocol == 'rest') {
+            $status = get_string('yes');
+        }
+
     }
 }
 $row[1] = $status;
-$row[2] = get_string('enableprotocolsdescription', 'webservice');
+$row[2] = get_string('enablerestdescription', 'quizaccess_examity');
 $table->data[] = $row;
 
 // Create user account.
 $row = array();
-$url = new moodle_url("/user/editadvanced.php?id=-1");
+$url = new moodle_url("/user/editadvanced.php", ['id' => -1]);
 $row[0] = "3. " . html_writer::tag('a', get_string('createuser', 'webservice'),
                 array('href' => $url));
-$row[1] = "";
-$row[2] = get_string('createuserdescription', 'webservice');
+
+$userstatus = get_string('no');
+$rolestatus = get_string('no');
+
+$examityuser = $DB->record_exists('user', ['deleted' => 0, 'username' => 'developers@examity.com']);
+$role = $DB->get_record('role', ['shortname' => 'examity']);
+if (!empty($examityuser)) {
+    $userstatus = get_string('yes');
+
+    if (!empty($role) && user_has_role_assignment($examityuser->id, $role->id, SYSCONTEXTID)) {
+        $rolestatus = get_string('yes');
+    }
+}
+$row[1] = $userstatus;
+$row[2] = get_string('createuserdescription', 'quizaccess_examity');
 $table->data[] = $row;
 
 // Add capability to users.
 $row = array();
-$url = new moodle_url("/admin/roles/check.php?contextid=1");
+$url = new moodle_url("/admin/roles/assign.php", ['contextid' => SYSCONTEXTID, 'roleid' => $role->id]);
 $row[0] = "4. " . html_writer::tag('a', get_string('checkusercapability', 'webservice'),
                 array('href' => $url));
-$row[1] = "";
-$row[2] = get_string('checkusercapabilitydescription', 'webservice');
+$row[1] = $rolestatus;
+$row[2] = get_string('checkusercapabilitydescription', 'quizaccess_examity');
 $table->data[] = $row;
 
 // Create token for the specific user.

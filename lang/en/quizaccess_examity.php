@@ -75,4 +75,8 @@ $string['defaultstatehelp'] = 'Determines if examity is preconfigured to enabled
 $string['privacy:metadata:quizaccess_examity_u:userid'] = 'The Moodle userid';
 $string['privacy:metadata:quizaccess_examity_u:examity_user_id'] = 'The user id which the examity system uses';
 $string['privacy:metadata:quizaccess_examity_u'] = 'Stores details about the user';
+$string['enablerest'] = 'Enable Rest protocol';
+$string['enablerestdescription'] = 'Examity requires the "Rest" protocol be enabled on your site.';
+$string['createuserdescription'] = 'A user must be created with the username/email "developers@examity.com"';
+$string['checkusercapabilitydescription'] = 'The examity user must be added to the site-wide "examity" role';
 

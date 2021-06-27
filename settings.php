@@ -65,14 +65,11 @@ if ($hassiteconfig) {
             get_string('defaultstate', 'quizaccess_examity'),
             get_string('defaultstatehelp', 'quizaccess_examity'), '', ['Enabled' , 'Disabled']));
     }
-
-    $ADMIN->add(
-        'root',
+    $ADMIN->add('modsettingsquizcat',
         new admin_externalpage(
-            'local_custom_links',
+            'quizaccess_examity/webservices',
             get_string('web_services', 'quizaccess_examity'),
-            new moodle_url('/mod/quiz/accessrule/examity/examity_default.php'),
-           'moodle/site:config'
-       )
+            new moodle_url('/mod/quiz/accessrule/examity/examity_default.php')
+        )
     );
 }
