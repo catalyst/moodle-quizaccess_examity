@@ -24,7 +24,31 @@
  */
 
 require_once(dirname(__FILE__) . "/../../../../config.php");
-require_login();
+require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->dirroot . '/' . $CFG->admin . '/webservice/lib.php');
+require_once($CFG->dirroot . '/webservice/lib.php');
+
+admin_externalpage_setup('quizaccess_examity/webservices');
+
+$examityuser = $DB->get_record('user', ['deleted' => 0, 'username' => 'developers@examity.com']);
+$role = $DB->get_record('role', ['shortname' => 'examity']);
+
+// If examity user exists, make sure this user is allowed to call the custom webservice.
+if (!empty($examityuser)) {
+    $webservicemanager = new webservice();
+
+    $examityservice = $DB->get_record('external_services',
+        ['shortname' => 'quizaccess_examity', 'component' => 'quizaccess_examity']);
+    if (!empty($examityservice)) {
+        $allowedusers = $webservicemanager->get_ws_authorised_users($examityservice->id);
+        if (!array_key_exists($examityuser->id, $allowedusers)) {
+            $serviceuser = new stdClass();
+            $serviceuser->externalserviceid = $examityservice->id;
+            $serviceuser->userid = $examityuser->id;
+            $webservicemanager->add_ws_authorised_user($serviceuser);
+        }
+    }
+}
 
 $context = context_system::instance();
 $PAGE->set_url($CFG->wwwroot.'/mod/quiz/accessrule/examity_default.php');
@@ -32,7 +56,6 @@ $PAGE->set_context($context);
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading($SITE->fullname);
 $PAGE->navbar->add(get_string('examity_web_services', 'quizaccess_examity'));
-
 
 echo $OUTPUT->header();
 
@@ -93,8 +116,6 @@ $row[0] = "3. " . html_writer::tag('a', get_string('createuser', 'webservice'),
 $userstatus = get_string('no');
 $rolestatus = get_string('no');
 
-$examityuser = $DB->record_exists('user', ['deleted' => 0, 'username' => 'developers@examity.com']);
-$role = $DB->get_record('role', ['shortname' => 'examity']);
 if (!empty($examityuser)) {
     $userstatus = get_string('yes');
 

@@ -18,7 +18,7 @@
  * Plugin version and other meta-data are defined here.
  *
  * @package     quizaccess_examity
- * @copyright   Copyright: "2021 Catalyst IT"
+ * @copyright   2021 Catalyst IT
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'quizaccess_examity';
 $plugin->release = '0.1.0';
-$plugin->version = 2021041947;
+$plugin->version = 2021062800;
 $plugin->requires = 2016052300;
-$plugin->maturity = MATURITY_BETA;
+$plugin->maturity = MATURITY_STABLE;

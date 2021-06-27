@@ -31,8 +31,9 @@ $services = array(
             'core_enrol_get_enrolled_users',
             'mod_quiz_get_quizzes_by_courses'
         ),
-        'restrictedusers' => 0,
+        'restrictedusers' => 1,
         'enabled' => 1,
-        'shortname' => 'quizaccess_examity'
+        'shortname' => 'quizaccess_examity',
+        'requiredcapability' => 'moodle/course:update'
     )
 );
