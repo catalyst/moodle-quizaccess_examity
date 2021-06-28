@@ -1,37 +1,40 @@
-# examity #
-
+# Examity
 Description : 
 Moodle / Examity integration 
-https://www.examity.com/
+https://www.examity.com
 
-Providing an easy way to connect to Examity within course quiz
+Provides an easy way to connect to Examity for online proctoring of your Moodle exam.
 
-## Installing via uploaded ZIP file ##
+## Installing the plugin
+Please see the instructions here for installing plugins in Moodle:
+https://docs.moodle.org/en/Installing_plugins#Installing_a_plugin
 
-1. Log in to your Moodle site as an admin and go to _Site administration >
-   Plugins > Install plugins_.
-2. Upload the ZIP file with the plugin code. You should only be prompted to add
-   extra details if your plugin type is not automatically detected.
-3. Check the plugin validation report and finish the installation.
+## Configuring the plugin
+### Api access:
+Once you have installed the plugin, log in as the site administrator and go to the page: 
+admin > Plugins > Activity modules > "Quiz", click on the link to "Examity" and fill out the API credentials as supplied by Examity
 
-## Installing manually ##
+### Examity webservice access:
+Examity makes web-services calls to your Moodle site to allow it to obtain user lists and other relevant information about your quizzes. This plugin automatically creates:
+* Custom site-level role to allow the examity user to have the relevant capabilities.
+* Custom web-service function that allows certain Moodle web-service functions to be called by examity.
 
-The plugin can be also installed by putting the contents of this directory to
+While logged in as the site administrator, visit the Examity web services page under admin > plugins > activity modules > Quiz to help guide you through the configuration steps, including
+* Enabling Web services on your site
+* Enabling the Rest protocol
+* Create a new user in your site with the username/email "developers@examity.com"
+* Add this user to the site-level "examity" role.
+* Create a web-services token - to create a new token, you must create a token for the developers@examity.com account, and select the custom "Examity" service already created - once you have created a token, please provide this token to Examity so they can connect to your site.
 
-    {your/moodle/dirroot}/mod/quiz/accessrule/examity
+## Support
+If you have issues with the plugin itself, please log them in github here: https://github.com/catalyst/moodle-quizaccess_examity/issues
 
-Afterwards, log in to your Moodle site as an admin and go to _Site administration >
-Notifications_ to complete the installation.
+This plugin was developed by Catalyst IT
+https://www.catalyst.net.nz/
 
-Alternatively, you can run
-
-    $ php admin/cli/upgrade.php
-
-to complete the installation from the command line.
 
 ## License ##
-
-Copyright: \"2021 Catalyst IT\"
+Copyright: 2021 Catalyst IT
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
