@@ -57,7 +57,6 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
         $mform->addElement('header', 'examity', 'Examity');
         $mform->addElement('select', 'examity_enabled', get_string('select_field', 'quizaccess_examity'), $attributes);
 
-
         if ($defaultstate == "1") {
             $mform->setDefault('examity_enabled', 1);
         } else {
