@@ -52,7 +52,7 @@ class backup_quizaccess_examity_subplugin extends backup_mod_quiz_access_subplug
         $examitycourse->set_source_table('quizaccess_examity_c', array('course' => backup::VAR_COURSEID));
 
         $examityquizes = new backup_nested_element('examity_quizes');
-        $examityquiz = new backup_nested_element('examity_quiz', array('id'), array('quiz', 'examity_quiz_id'));
+        $examityquiz = new backup_nested_element('examity_quiz', array('id'), array('quiz', 'examity_exam_id'));
         $subpluginwrapper->add_child($examityquizes);
         $examityquizes->add_child($examityquiz);
         $examityquiz->set_source_table('quizaccess_examity_e', array('quiz' => backup::VAR_ACTIVITYID));
