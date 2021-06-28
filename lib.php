@@ -38,16 +38,27 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
     $config = get_config('quizaccess_examity');
 
     // If examity is enabled then show an enable / disable dropdown in quiz form.
-    $examityenabled = isset($config->examity_manage) ?? null;
-    $defaultstate = isset($config->defaultstate) ?? null;
 
-    if ($modulename == 'quiz' && $examityenabled == '1') {
+    if (isset($config->examity_manage)) {
+        $examityenabled = $config->examity_manage;
+    } else {
+        $examityenabled = "0";
+    }
+
+    if (isset($config->defaultstate)) {
+        $defaultstate = $config->defaultstate;
+    } else {
+        $defaultstate = "0";
+    }
+
+    if ($modulename == 'quiz' && $examityenabled == "1") {
         $attributes = array(0 => get_string('disable', 'quizaccess_examity'),
                             1 => get_string('enable', 'quizaccess_examity'));
         $mform->addElement('header', 'examity', 'Examity');
         $mform->addElement('select', 'examity_enabled', get_string('select_field', 'quizaccess_examity'), $attributes);
 
-        if ($defaultstate == 1) {
+
+        if ($defaultstate == "1") {
             $mform->setDefault('examity_enabled', 1);
         } else {
             $mform->setDefault('examity_enabled', 0);
