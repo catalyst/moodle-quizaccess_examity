@@ -61,9 +61,11 @@ class restore_quizaccess_examity_subplugin extends restore_mod_quiz_access_subpl
         global $DB;
 
         $data = (object)$data;
-        if (empty($this->task->get_moduleid())) {
+        if (empty($this->task->get_courseid())) {
             return;
         }
+
+        $data->course = $this->task->get_courseid();
 
         $DB->insert_record('quizaccess_examity_c', $data);
     }
@@ -77,7 +79,10 @@ class restore_quizaccess_examity_subplugin extends restore_mod_quiz_access_subpl
 
         $data = (object)$data;
 
+        $data->quiz = $this->get_new_parentid('quiz');
+
         $DB->insert_record('quizaccess_examity_e', $data);
     }
 
 }
+
