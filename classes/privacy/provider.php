@@ -25,8 +25,10 @@
 namespace quizaccess_examity\privacy;
 
 defined('MOODLE_INTERNAL') || die();
+
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\{writer, helper, contextlist, approved_contextlist, approved_userlist, userlist};
+use context;
 
 /**
  * Privacy subsystem for quizaccess_examity.
@@ -36,7 +38,8 @@ use core_privacy\local\request\{writer, helper, contextlist, approved_contextlis
  */
 class provider implements
     \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\core_userlist_provider {
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider {
 
     /**
      * Return the fields which contain personal data.
@@ -45,7 +48,6 @@ class provider implements
      * @return collection the updated collection of metadata items.
      */
     public static function get_metadata(collection $collection) : collection {
-
         $collection->add_database_table(
             'quizaccess_examity_u',
             [
@@ -62,8 +64,7 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid($userid) : contextlist {
-
+    public static function get_contexts_for_userid(int $userid) : contextlist {
         global $DB;
         $examityuserid = $DB->get_field('quizaccess_examity_u', 'examity_user_id', ['userid' => $userid]);
         $contextlist = new contextlist();
@@ -82,7 +83,6 @@ class provider implements
      * @param   array       $linkarray The weird and wonderful link array used to display information for a specific item
      */
     public static function export_examity_user_data(int $userid, \context $context, array $subcontext, array $linkarray) {
-
         global $DB;
         $examityuserid = $DB->get_field('quizaccess_examity_u', 'examity_user_id', ['userid' => $userid]);
         $finaldata = (object) ['quizaccess_examity' => ['examityuserid' => $examityuserid]];
@@ -96,7 +96,6 @@ class provider implements
      * @param  \context $context   The context to refine the deletion.
      */
     public static function delete_examity_for_user(int $userid, $context) {
-
         global $DB;
         if (!$context instanceof \context_system) {
             return;
@@ -113,27 +112,13 @@ class provider implements
      * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
-
-        global $DB;
         $context = $userlist->get_context();
 
-        if (!$context instanceof \context_module) {
+        if (!$context instanceof \context_system) {
             return;
         }
 
-        $userids = $userlist->get_userids();
-
-        foreach ($userids as $userid) {
-
-            $sql = "SELECT userid
-            FROM {quizaccess_examity_u}
-            WHERE userid = :userid";
-
-            $params = ['userid' => $userid];
-            $userlist->add_from_sql('userid', $sql, $params);
-
-        }
-
+        $userlist->add_from_sql('userid', 'select userid from {quizaccess_examity_u}', []);
     }
 
     /**
@@ -142,18 +127,46 @@ class provider implements
      * @param   approved_userlist $userlist  The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-
         global $DB;
         $context = $userlist->get_context();
 
-        if (!$context instanceof \context_module) {
+        if (!$context instanceof \context_system) {
+            return;
+        }
+        $DB->delete_records('quizaccess_examity_u');
+    }
+
+    /**
+     * Delete data for single user.
+     *
+     * @param   approved_userlist $userlist  The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_user(approved_contextlist $contextlist) {
+        global $DB;
+        $userid = $contextlist->get_user()->id;
+
+        $DB->delete_records('quizaccess_examity_u', ['userid' => $userid]);
+    }
+
+    /**
+     * Delete all data for all users in the specified context.
+     *
+     * @param context $context The specific context to delete data for.
+     */
+    public static function delete_data_for_all_users_in_context(context $context) {
+        global $DB;
+        if (!$context instanceof \context_system) {
             return;
         }
 
-        $userids = $userlist->get_userids();
+        $DB->delete_records('quizaccess_examity_u');
+    }
 
-        foreach ($userids as $userid) {
-            $DB->delete_records('quizaccess_examity_u', ['userid' => $userid]);
-        }
+    /**
+     * Export all user data for the specified user, in the specified contexts.
+     *
+     * @param approved_contextlist $contextlist The approved contexts to export information for.
+     */
+    public static function export_user_data(approved_contextlist $contextlist) {
     }
 }
