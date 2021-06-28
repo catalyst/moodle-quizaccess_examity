@@ -63,7 +63,9 @@ if ($hassiteconfig) {
 
         $settings->add(new admin_setting_configselect('quizaccess_examity/defaultstate',
             get_string('defaultstate', 'quizaccess_examity'),
-            get_string('defaultstatehelp', 'quizaccess_examity'), '', ['Enabled' , 'Disabled']));
+            get_string('defaultstatehelp', 'quizaccess_examity'), 0,
+            [0 => get_string('disabled', 'quizaccess_examity'),
+            1 => get_string('enabled', 'quizaccess_examity')]));
     }
     $ADMIN->add('modsettingsquizcat',
         new admin_externalpage(

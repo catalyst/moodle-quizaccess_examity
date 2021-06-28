@@ -71,7 +71,6 @@ $string['logintoexamity'] = 'Click here to login into Examity';
 $string['web_services'] = 'Examity web services';
 $string['defaultstate'] = 'Default quiz state';
 $string['defaultstatehelp'] = 'Determines if examity is preconfigured to enabled within a quiz';
-
 $string['privacy:metadata:quizaccess_examity_u:userid'] = 'The Moodle userid';
 $string['privacy:metadata:quizaccess_examity_u:examity_user_id'] = 'The user id which the examity system uses';
 $string['privacy:metadata:quizaccess_examity_u'] = 'Stores details about the user';
