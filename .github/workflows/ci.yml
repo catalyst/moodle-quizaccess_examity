@@ -17,7 +17,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10
+        image: mariadb:10.5
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4']
+        php-versions: ['7.2']
         database: ['pgsql', 'mariadb']
     steps:
       - name: Check out repository code
@@ -63,7 +63,7 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           # TODO: Omitted MOODLE_BRANCH results in regex failure, investigate.
-          MOODLE_BRANCH: 'master'
+          MOODLE_BRANCH: 'MOODLE_35_STABLE'
 
       - name: Run phplint
         if: ${{ always() }}
