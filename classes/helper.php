@@ -674,13 +674,17 @@ class helper
      * @since  Moodle 3.0
      */
     public static function lti_get_launch_data($instance) {
-        global $PAGE, $USER;
+        global $PAGE, $USER, $CFG;
 
         $typeid = null;
-        $ltiversion = LTI_VERSION_1;
 
         $typeconfig = (array)$instance;
+        // Default the organizationid if not specified.
+        if (empty($typeconfig['organizationid'])) {
+            $urlparts = parse_url($CFG->wwwroot);
 
+            $typeconfig['organizationid'] = $urlparts['host'];
+        }
         $toolproxy = null;
         $key = $instance->resourcekey;
         $secret = $instance->password;
@@ -693,14 +697,14 @@ class helper
             $endpoint = trim($instance->securetoolurl);
         }
 
-        $orgid = lti_get_organizationid($typeconfig);
+        $orgid = $typeconfig['organizationid'];
 
         $course = $PAGE->course;
 
         $allparams = lti_build_request($instance, $typeconfig, $course, $typeid);
         $requestparams = $allparams;
 
-        $requestparams = array_merge($requestparams, lti_build_standard_message($instance, $orgid, $ltiversion));
+        $requestparams = array_merge($requestparams, lti_build_standard_request($instance, $orgid, false));
 
         // Always load in current window.
         $launchcontainer = LTI_LAUNCH_CONTAINER_REPLACE_MOODLE_WINDOW;

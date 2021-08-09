@@ -28,4 +28,5 @@ $plugin->component = 'quizaccess_examity';
 $plugin->release = '0.1.0';
 $plugin->version = 2021012800;
 $plugin->requires = 2018051700; // Requires 3.5
+$plugin->incompatible = 39;
 $plugin->maturity = MATURITY_STABLE;
