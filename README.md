@@ -5,6 +5,14 @@ https://www.examity.com
 
 Provides an easy way to connect to Examity for online proctoring of your Moodle exam.
 
+Branches
+--------
+
+| Moodle verion     | Branch           | PHP  |
+| ----------------- | ---------------- | ---- |
+| Moodle 3.5 to 3.8 | MOODLE_35_STABLE | 7.3+ |
+| Moodle 3.9 and higher | MOODLE_39_STABLE | 7.3+ |
+
 ## Installing the plugin
 Please see the instructions here for installing plugins in Moodle:
 https://docs.moodle.org/en/Installing_plugins#Installing_a_plugin
