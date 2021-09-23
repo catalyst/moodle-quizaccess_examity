@@ -27,6 +27,7 @@ require_once(dirname(__FILE__) . "/../../../../config.php");
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/webservice/lib.php');
 require_once($CFG->dirroot . '/webservice/lib.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/examity/lib.php');
 
 admin_externalpage_setup('quizaccess_examity/webservices');
 
@@ -51,7 +52,7 @@ if (!empty($examityuser)) {
 }
 
 $context = context_system::instance();
-$PAGE->set_url($CFG->wwwroot.'/mod/quiz/accessrule/examity_default.php');
+$PAGE->set_url($CFG->wwwroot.'/mod/quiz/accessrule/examity/examity_default.php');
 $PAGE->set_context($context);
 $PAGE->set_title($SITE->fullname);
 $PAGE->set_heading($SITE->fullname);
@@ -73,10 +74,24 @@ $table->data = array();
 $return .= $brtag . get_string('onesystemcontrollingdescription', 'webservice')
         . $brtag . $brtag;
 
+// Configure examity settings.
+$row = array();
+$url = new moodle_url("/admin/settings.php?section=quizaccess_examity");
+$row[0] = "1. " . html_writer::tag('a', get_string('configureexamity', 'quizaccess_examity'),
+        array('href' => $url));
+$status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
+if (quizaccess_examity_enabled()) {
+    $status = get_string('yes');
+}
+$row[1] = $status;
+$row[2] = get_string('configureexamitydescription', 'quizaccess_examity');
+$table->data[] = $row;
+
+
 // Enable Web Services.
 $row = array();
 $url = new moodle_url("/admin/search.php?query=enablewebservices");
-$row[0] = "1. " . html_writer::tag('a', get_string('enablews', 'webservice'),
+$row[0] = "2. " . html_writer::tag('a', get_string('enablews', 'webservice'),
                 array('href' => $url));
 $status = html_writer::tag('span', get_string('no'), array('class' => 'badge badge-danger'));
 if ($CFG->enablewebservices) {
@@ -89,7 +104,7 @@ $table->data[] = $row;
 // Enable protocols.
 $row = array();
 $url = new moodle_url("/admin/settings.php?section=webserviceprotocols");
-$row[0] = "2. " . html_writer::tag('a', get_string('enablerest', 'quizaccess_examity'),
+$row[0] = "3. " . html_writer::tag('a', get_string('enablerest', 'quizaccess_examity'),
                 array('href' => $url));
 $status = html_writer::tag('span', get_string('none'), array('class' => 'badge badge-danger'));
 // Retrieve activated protocol.
@@ -110,7 +125,7 @@ $table->data[] = $row;
 // Create user account.
 $row = array();
 $url = new moodle_url("/user/editadvanced.php", ['id' => -1]);
-$row[0] = "3. " . html_writer::tag('a', get_string('createuser', 'webservice'),
+$row[0] = "4. " . html_writer::tag('a', get_string('createuser', 'webservice'),
                 array('href' => $url));
 
 $userstatus = get_string('no');
@@ -130,7 +145,7 @@ $table->data[] = $row;
 // Add capability to users.
 $row = array();
 $url = new moodle_url("/admin/roles/assign.php", ['contextid' => SYSCONTEXTID, 'roleid' => $role->id]);
-$row[0] = "4. " . html_writer::tag('a', get_string('checkusercapability', 'webservice'),
+$row[0] = "5. " . html_writer::tag('a', get_string('checkusercapability', 'webservice'),
                 array('href' => $url));
 $row[1] = $rolestatus;
 $row[2] = get_string('checkusercapabilitydescription', 'quizaccess_examity');
@@ -139,7 +154,7 @@ $table->data[] = $row;
 // Create token for the specific user.
 $row = array();
 $url = new moodle_url("/admin/webservice/tokens.php?sesskey=" . sesskey() . "&action=create");
-$row[0] = "5. " . html_writer::tag('a', get_string('createtokenforuser', 'webservice'),
+$row[0] = "6. " . html_writer::tag('a', get_string('createtokenforuser', 'webservice'),
                 array('href' => $url));
 $row[1] = "";
 $row[2] = get_string('createtokenforuserdescription', 'webservice');

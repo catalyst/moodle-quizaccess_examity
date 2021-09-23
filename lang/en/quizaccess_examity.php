@@ -78,4 +78,6 @@ $string['enablerest'] = 'Enable Rest protocol';
 $string['enablerestdescription'] = 'Examity requires the "Rest" protocol be enabled on your site.';
 $string['createuserdescription'] = 'A user must be created with the username/email "developers@examity.com"';
 $string['checkusercapabilitydescription'] = 'The examity user must be added to the site-wide "examity" role';
+$string['configureexamity'] = 'Configure examity settings';
+$string['configureexamitydescription'] = 'Examity must be configured correctly with keys and urls.';
 

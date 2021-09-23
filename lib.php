@@ -34,16 +34,11 @@ use quizaccess_examity\helper;
  * @param object $mform
  */
 function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform) {
+    if (!quizaccess_examity_enabled()) {
+        return;
+    }
     $modulename = $formwrapper->get_current()->modulename;
     $config = get_config('quizaccess_examity');
-
-    // If examity is enabled then show an enable / disable dropdown in quiz form.
-
-    if (isset($config->examity_manage)) {
-        $examityenabled = $config->examity_manage;
-    } else {
-        $examityenabled = "0";
-    }
 
     if (isset($config->defaultstate)) {
         $defaultstate = $config->defaultstate;
@@ -51,7 +46,7 @@ function quizaccess_examity_coursemodule_standard_elements($formwrapper, $mform)
         $defaultstate = "0";
     }
 
-    if ($modulename == 'quiz' && $examityenabled == "1") {
+    if ($modulename == 'quiz' && $config->examity_manage == "1") {
         $attributes = array(0 => get_string('disable', 'quizaccess_examity'),
                             1 => get_string('enable', 'quizaccess_examity'));
         $mform->addElement('header', 'examity', 'Examity');
@@ -86,4 +81,22 @@ function quizaccess_examity_coursemodule_validation($mform) {
 
     }
     return $errors;
+}
+
+/**
+ * Helper function to check if examity has been configured on this site.
+ *
+ * @return bool
+ * @throws dml_exception
+ */
+function quizaccess_examity_enabled() {
+    $config = get_config('quizaccess_examity');
+    $requiredparams = ['examity_manage', 'username', 'password', 'client_id',
+                       'apiurl', 'providerkey', 'providersecret', 'ltiurl'];
+    foreach ($requiredparams as $param) {
+        if (empty($config->$param)) {
+            return false;
+        }
+    }
+    return true;
 }
