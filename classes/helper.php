@@ -373,9 +373,25 @@ class helper
     public static function create_examity_course($url, $examityuserid, $course, $examitytoken) {
         global $DB;
         $coursecode = self::get_courseidentifier($course);
-        $url = $url . '/courses';
+        $courseurl = $url . '/courses';
 
-        $postdata = "{
+        $postdata = ['filter_query' => '{"field":"course_code", "op":"eq", "value":"'.$coursecode.'"}'];
+        $request = self::post_api($courseurl, 'read', $postdata, $examitytoken);
+        $response = json_decode($request, true);
+        if (isset($response['content'][0]['course_id']) && $response['content'][0]['course_code'] == $coursecode) {
+            // Course already exists - save the id locally.
+            $data = [
+                'id' => null,
+                'course' => $course->id,
+                'examity_course_id' => $response['content'][0]['course_id']
+            ];
+
+            $DB->insert_record('quizaccess_examity_c', $data);
+
+            return $response['content'][0];
+
+        } else {
+            $postdata = "{
                 \"course_code\":\"$coursecode\",
                 \"course_name\":\"$course->fullname\",
                 \"primary_instructor_id\":$examityuserid,
@@ -384,24 +400,25 @@ class helper
                 \"metadata\":{}
             }";
 
-        $examitycourse = self::post_api($url, 'create', $postdata, $examitytoken);
-        $examitycourse = json_decode($examitycourse, true);
+            $examitycourse = self::post_api($courseurl, 'create', $postdata, $examitytoken);
+            $examitycourse = json_decode($examitycourse, true);
 
-        if (!isset($examitycourse['course_id'])) {
-            $message = get_string('error_create_course', 'quizaccess_examity');
-            $messagetype = 'error';
-            \core\notification::add($message, $messagetype);
-        } else {
-            $data = [
-                'id' => null,
-                'course' => $course->id,
-                'examity_course_id' => $examitycourse['course_id']
-            ];
+            if (!isset($examitycourse['course_id'])) {
+                $message = get_string('error_create_course', 'quizaccess_examity');
+                $messagetype = 'error';
+                \core\notification::add($message, $messagetype);
+            } else {
+                $data = [
+                    'id' => null,
+                    'course' => $course->id,
+                    'examity_course_id' => $examitycourse['course_id']
+                ];
 
-            $DB->insert_record('quizaccess_examity_c', $data);
+                $DB->insert_record('quizaccess_examity_c', $data);
+            }
+
+            return $examitycourse;
         }
-
-        return $examitycourse;
     }
 
     /**
