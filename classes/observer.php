@@ -83,7 +83,7 @@ class quizaccess_examity_observer {
 
                 if (!$examitycourseid) {
                     // Create a course in examity if we have not created one before.
-                    helper::create_examity_course($config->apiurl, $examityuserid, $COURSE, $examitytoken);
+                    $examitycourseid = helper::create_examity_course($config->apiurl, $examityuserid, $COURSE, $examitytoken);
                 } else {
                     helper::update_examity_course($config->apiurl, $examityuserid, $examitycourseid, $COURSE, $examitytoken);
                 }

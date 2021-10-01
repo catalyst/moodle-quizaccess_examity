@@ -388,7 +388,7 @@ class helper
 
             $DB->insert_record('quizaccess_examity_c', $data);
 
-            return $response['content'][0];
+            return $response['content'][0]['course_id'];
 
         } else {
             $postdata = "{
