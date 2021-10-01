@@ -438,7 +438,7 @@ class helper
 
         if (isset($quiz->id)) {
             $courseid        = (int)$examitycourseid;
-            $duration         = $quiz->timelimit;
+            $duration         = $quiz->timelimit / 60;
             $examenddate    = $quiz->timeclose;
             $ruleid          = 0;
             $ruledescription = null;
@@ -557,7 +557,7 @@ class helper
         if (isset($quiz->id)) {
             $examityexam = null;
             $courseid        = (int)$quiz->course;
-            $duration         = $quiz->timelimit;
+            $duration         = $quiz->timelimit / 60;
             $examenddate    = $quiz->timeclose;
             $ruleid          = 0;
             $ruledescription = null;
