@@ -800,9 +800,8 @@ class helper
      * @return string
      */
     public static function get_courseidentifier($course) {
-        global $CFG;
-        // We use the first 6 chars of the siteidentifier to prevent issues when the same examity account is used on multiple sites.
-        return (substr($CFG->siteidentifier, 0, 6)."_".$course->id."_".$course->shortname);
+        // Examity needs the moodle courseid at this stage - in future we may try to make this more unique.
+        return $course->id;
     }
 
     /**
