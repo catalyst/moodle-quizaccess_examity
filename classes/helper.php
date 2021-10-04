@@ -407,6 +407,7 @@ class helper
                 $message = get_string('error_create_course', 'quizaccess_examity');
                 $messagetype = 'error';
                 \core\notification::add($message, $messagetype);
+                return false;
             } else {
                 $data = [
                     'id' => null,
@@ -417,7 +418,7 @@ class helper
                 $DB->insert_record('quizaccess_examity_c', $data);
             }
 
-            return $examitycourse;
+            return $examitycourse['course_id'];
         }
     }
 
