@@ -140,7 +140,7 @@ class helper
         if ($errorno) {
             $error = $content;
             if (!$fullresponse) {
-                debugging("cURL request for \"$url\" failed with: $error ($error_no)", DEBUG_ALL);
+                debugging("cURL request for \"$url\" failed with: $error ($errorno)", DEBUG_ALL);
                 return false;
             }
 
