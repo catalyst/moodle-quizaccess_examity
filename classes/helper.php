@@ -41,8 +41,6 @@ namespace quizaccess_examity;
 use curl;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class helper
  *
@@ -50,8 +48,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class helper
-{
+class helper {
 
     /**
      * Run curl on examity's bridge api.
